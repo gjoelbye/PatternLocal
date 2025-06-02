@@ -54,7 +54,7 @@ class RidgeSolver(LocalSolverBase):
             **kwargs: Additional arguments (unused)
 
         Returns:
-            Patternlocal explanation weights (Ridge coefficients)
+           patternlocal explanation weights (Ridge coefficients)
         """
         self._validate_inputs(lime_weights, lime_intercept, instance, X_train)
 

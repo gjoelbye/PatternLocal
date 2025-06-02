@@ -13,7 +13,7 @@ def test_imports():
     try:
         pass
 
-        print("  PatternLocalExplainer imported successfully")
+        print(" PatternLocalExplainer imported successfully")
 
         print("  Simplification methods imported successfully")
 
@@ -31,7 +31,7 @@ def test_imports():
 def test_basic_functionality():
     """Test basic functionality."""
     try:
-        from pattern_local import PatternLocalExplainer
+        from patternlocal import PatternLocalExplainer
 
         # Test basic initialization
         explainer = PatternLocalExplainer()
@@ -72,7 +72,7 @@ def test_end_to_end():
         from sklearn.datasets import make_classification
         from sklearn.ensemble import RandomForestClassifier
 
-        from pattern_local import PatternLocalExplainer
+        from patternlocal import PatternLocalExplainer
 
         # Create simple data
         X, y = make_classification(n_samples=50, n_features=5, random_state=42)

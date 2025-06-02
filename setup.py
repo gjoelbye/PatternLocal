@@ -13,7 +13,7 @@ setup(
     version="1.0.0",
     author="Anders Gjølbye",
     author_email="agjma@dtu.com",
-    description="Unified pattern-based explanations for machine learning models",
+    description="PatternLocal explanations for machine learning models",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/gjoelbye/PatternLocal",
@@ -39,9 +39,9 @@ setup(
         "scikit-learn>=1.0.0",
         "scipy>=1.7.0",
         "lime>=0.2.0",
+        "scikit-image>=0.18.0",
     ],
     extras_require={
-        "superpixel": ["scikit-image>=0.18.0"],
         "dev": [
             "pytest>=6.0",
             "pytest-cov>=2.0",
@@ -55,13 +55,8 @@ setup(
             "seaborn>=0.11.0",
         ],
     },
-    keywords="explainable-ai, machine-learning, pattern-analysis, lime, interpretability",
+    keywords="explainable-ai, machine-learning, patternlocal, lime, interpretability",
     project_urls={
         "Source": "https://github.com/gjoelbye/PatternLocal",
-    },
-    entry_points={
-        "console_scripts": [
-            "pattern-local-demo=pattern_local.examples.demo:main",
-        ],
     },
 )

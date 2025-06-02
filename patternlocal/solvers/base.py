@@ -13,8 +13,8 @@ from ..config.validation import ParameterValidator
 class BaseSolver(ABC):
     """Abstract base class for patternlocal solvers.
 
-    Patternlocal solvers take LIME weights and compute patternlocal explanations
-    using various methods (local covariance, Lasso, Ridge, etc.).
+    patternlocal solvers take LIME weights and compute patternlocal explanations
+     using various methods (local covariance, Lasso, Ridge, etc.).
     """
 
     def __init__(self, params: Optional[Dict[str, Any]] = None):
@@ -44,7 +44,7 @@ class BaseSolver(ABC):
             **kwargs: Additional patternlocal solver-specific arguments
 
         Returns:
-            Patternlocal explanation weights
+           patternlocal explanation weights
         """
 
     def _validate_inputs(

@@ -31,7 +31,7 @@ PatternLocal is a comprehensive Python package for generating local explanations
 
 **Tabular Data:**
 ```python
-from pattern_local import PatternLocalExplainer
+from patternlocal import PatternLocalExplainer
 
 # Tabular data explainer
 explainer = PatternLocalExplainer(
@@ -82,7 +82,7 @@ pip install -e .
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
-from pattern_local import PatternLocalExplainer
+from patternlocal import PatternLocalExplainer
 
 # Create sample data
 X, y = make_classification(n_samples=1000, n_features=20, random_state=42)
@@ -119,7 +119,7 @@ lime_weights = explanation['lime_weights']
 ```python
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from pattern_local import PatternLocalExplainer
+from patternlocal import PatternLocalExplainer
 
 # Create sample image data (28x28 images)
 n_samples, image_shape = 500, (28, 28)
@@ -286,7 +286,7 @@ solver_params = {
 ### Tabular Data with Different Solvers
 
 ```python
-from pattern_local import PatternLocalExplainer
+from patternlocal import PatternLocalExplainer
 from sklearn.datasets import load_breast_cancer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -329,7 +329,7 @@ for solver_name in solvers:
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from pattern_local import PatternLocalExplainer
+from patternlocal import PatternLocalExplainer
 
 # Create synthetic image data with spatial patterns
 def create_image_data(n_samples=1000, image_shape=(28, 28)):
@@ -466,12 +466,12 @@ PatternLocal automatically detects the appropriate mode based on your configurat
 ## Examples
 
 See the `examples/` directory for comprehensive usage examples:
-- `pattern_local_demo.py`: Tabular data examples
+- ` patternlocal_demo.py`: Tabular data examples
 - `image_mode_demo.py`: Image data examples
 
 Run the demos:
 ```bash
-python examples/pattern_local_demo.py      # Tabular examples
+python examples/ patternlocal_demo.py      # Tabular examples
 python examples/image_mode_demo.py         # Image examples
 ```
 

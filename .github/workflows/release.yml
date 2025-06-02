@@ -27,7 +27,7 @@ jobs:
         with:
           extra_args: --all-files --show-diff-on-failure --color=always
       - name: Run tests
-        run: pytest --cov=pattern_local
+        run: pytest --cov= patternlocal
 
   publish:
     name: Build & upload to PyPI

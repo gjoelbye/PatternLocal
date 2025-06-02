@@ -4,11 +4,11 @@ include pyproject.toml
 include requirements-dev.txt
 
 # Include all Python files in the package
-recursive-include pattern_local *.py
-recursive-include pattern_local *.pyi
+recursive-include patternlocal *.py
+recursive-include patternlocal *.pyi
 
 # Include tests
-recursive-include pattern_local/tests *.py
+recursive-include patternlocal/tests *.py
 
 # Include examples
 recursive-include examples *.py

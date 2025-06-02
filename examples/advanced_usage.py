@@ -16,7 +16,7 @@ from sklearn.datasets import load_breast_cancer, make_classification
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
-from pattern_local import PatternLocalExplainer, SimplificationRegistry, SolverRegistry
+from patternlocal import PatternLocalExplainer, SimplificationRegistry, SolverRegistry
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

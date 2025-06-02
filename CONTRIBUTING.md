@@ -39,10 +39,10 @@ We use several tools to maintain code quality:
 
 Run all checks:
 ```bash
-black pattern_local examples
-isort pattern_local examples
-flake8 pattern_local examples
-mypy pattern_local
+black patternlocal examples
+isort patternlocal examples
+flake8 patternlocal examples
+mypy patternlocal
 ```
 
 ### Testing
@@ -52,10 +52,10 @@ Run tests with pytest:
 pytest
 
 # Run with coverage
-pytest --cov=pattern_local --cov-report=html
+pytest --cov= patternlocal --cov-report=html
 
 # Run specific test file
-pytest pattern_local/tests/test_unified_api.py
+pytest patternlocal/tests/test_unified_api.py
 ```
 
 ### Adding New Features
@@ -66,7 +66,7 @@ pytest pattern_local/tests/test_unified_api.py
    ```
 
 2. **Write tests first** (TDD approach):
-   - Add tests in `pattern_local/tests/`
+   - Add tests in ` patternlocal/tests/`
    - Follow existing test patterns
    - Use the fixtures in `conftest.py`
 
@@ -83,9 +83,9 @@ pytest pattern_local/tests/test_unified_api.py
 5. **Run all checks**:
    ```bash
    pytest
-   black --check pattern_local examples
-   isort --check-only pattern_local examples
-   flake8 pattern_local examples
+   black --check patternlocal examples
+   isort --check-only patternlocal examples
+   flake8 patternlocal examples
    ```
 
 ## Types of Contributions

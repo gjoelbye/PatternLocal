@@ -7,7 +7,7 @@ Supports both tabular and image data with advanced features like caching,
 parallel processing, and fluent interface.
 
 Examples:
-    >>> from pattern_local import PatternLocalExplainer
+    >>> from patternlocal import PatternLocalExplainer
     >>>
     >>> # Basic usage
     >>> explainer = PatternLocalExplainer(

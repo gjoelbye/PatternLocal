@@ -56,7 +56,7 @@ class LassoSolver(LocalSolverBase):
             **kwargs: Additional arguments (unused)
 
         Returns:
-            Patternlocal explanation weights (Lasso coefficients)
+           patternlocal explanation weights (Lasso coefficients)
         """
         self._validate_inputs(lime_weights, lime_intercept, instance, X_train)
 

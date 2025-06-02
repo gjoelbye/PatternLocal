@@ -19,7 +19,7 @@ class GlobalCovarianceSolver(BaseSolver):
     and applies it to the LIME weights. This serves as a baseline approach
     for patternlocal methods.
 
-    Patternlocal weights: a = w @ C_global
+    patternlocal weights: a = w @ C_global
     where w are LIME weights and C_global is the global covariance matrix.
     """
 
@@ -51,7 +51,7 @@ class GlobalCovarianceSolver(BaseSolver):
             **kwargs: Additional arguments (unused)
 
         Returns:
-            PatternLocal explanation weights
+           patternlocal explanation weights
         """
         self._validate_inputs(lime_weights, lime_intercept, instance, X_train)
 

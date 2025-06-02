@@ -7,10 +7,10 @@ import pytest
 from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
 
-from pattern_local import PatternLocalExplainer
-from pattern_local.exceptions import ConfigurationError, ValidationError
-from pattern_local.simplification import LowRankSimplification, NoSimplification
-from pattern_local.solvers import LassoSolver, LocalCovarianceSolver, NoSolver
+from patternlocal import PatternLocalExplainer
+from patternlocal.exceptions import ConfigurationError, ValidationError
+from patternlocal.simplification import LowRankSimplification, NoSimplification
+from patternlocal.solvers import LassoSolver, LocalCovarianceSolver, NoSolver
 
 
 class TestPatternLocalExplainer:

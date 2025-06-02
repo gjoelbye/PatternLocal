@@ -65,14 +65,14 @@ This document summarizes all the improvements made to transform PatternLocal int
 
 ### Basic Installation
 ```bash
-pip install pattern-local
+pip install patternlocal
 ```
 
 ### Development Installation
 ```bash
 git clone <repository>
 cd PatternLocal
-pip install -e ".[dev,superpixel,examples]"
+pip install -e ".[dev,examples]"
 ```
 
 ## 🧪 **Testing Commands**
@@ -82,23 +82,23 @@ pip install -e ".[dev,superpixel,examples]"
 pytest
 
 # Run with coverage
-pytest --cov=pattern_local --cov-report=html
+pytest --cov= patternlocal --cov-report=html
 
 # Run specific test
-pytest pattern_local/tests/test_unified_api.py
+pytest patternlocal/tests/test_unified_api.py
 
 # Run code quality checks
-black --check pattern_local examples
-isort --check-only pattern_local examples
-flake8 pattern_local examples
-mypy pattern_local
+black --check patternlocal examples
+isort --check-only patternlocal examples
+flake8 patternlocal examples
+mypy patternlocal
 ```
 
 ## 📚 **Usage Examples**
 
 ### Tabular Data (Auto-detected)
 ```python
-from pattern_local import PatternLocalExplainer
+from patternlocal import PatternLocalExplainer
 
 explainer = PatternLocalExplainer(
     simplification='lowrank',

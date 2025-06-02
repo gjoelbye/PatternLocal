@@ -5,8 +5,8 @@ Test the unified API functionality for both tabular and image modes.
 import numpy as np
 import pytest
 
-from pattern_local import PatternLocalExplainer
-from pattern_local.exceptions import ValidationError
+from patternlocal import PatternLocalExplainer
+from patternlocal.exceptions import ValidationError
 
 
 class TestUnifiedAPI:

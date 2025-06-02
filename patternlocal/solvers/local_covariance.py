@@ -18,7 +18,7 @@ class LocalCovarianceSolver(LocalSolverBase):
     This is the main patternlocal method that estimates a local covariance matrix
     using weighted k-nearest neighbors and applies it to LIME weights.
 
-    Patternlocal weights: a = w @ C_local
+    patternlocal weights: a = w @ C_local
     where w are LIME weights and C_local is the locally estimated covariance matrix.
     """
 
@@ -55,7 +55,7 @@ class LocalCovarianceSolver(LocalSolverBase):
             **kwargs: Additional arguments (unused)
 
         Returns:
-            Patternlocal explanation weights
+           patternlocal explanation weights
         """
         self._validate_inputs(lime_weights, lime_intercept, instance, X_train)
 
