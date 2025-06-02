@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "patternlocal"
 version = "1.0.0"
-description = "Unified pattern-based explanations for machine learning models"
+description = "PatternLocal explanations for machine learning models"
 readme = "README.md"
 authors = [
     {name = "PatternXAI Team", email = "your-email@domain.com"}
@@ -53,10 +53,10 @@ examples = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-repo/PatternXAI"
-Documentation = "https://github.com/your-repo/PatternXAI"
-Repository = "https://github.com/your-repo/PatternXAI"
-Issues = "https://github.com/your-repo/PatternXAI/issues"
+Homepage = "https://github.com/gjoelbye/PatternLocal"
+Documentation = "https://github.com/gjoelbye/PatternLocal"
+Repository = "https://github.com/gjoelbye/PatternLocal"
+Paper = "https://arxiv.org/abs/2505.11210"
 
 [tool.setuptools]
 packages = ["patternlocal"]
@@ -67,7 +67,7 @@ patternlocal = ["py.typed"]
 # Black code formatting
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py313']
 include = '\.pyi?$'
 
 # Flake8 formatting
@@ -82,7 +82,7 @@ multi_line_output = 3
 
 # MyPy type checking
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.13"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
