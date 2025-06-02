@@ -58,10 +58,3 @@ jobs:
           python -m pip install build
       - name: Run pytest
         run: pytest --cov=pattern_local
-      - name: Build wheel & sdist
-        run: python -m build --sdist --wheel --outdir dist/
-      - name: Upload distributions
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-package-distributions
-          path: dist/

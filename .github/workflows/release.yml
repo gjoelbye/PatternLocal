@@ -2,16 +2,16 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"          # any tag that starts with v
+    tags: ['v*']
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: read      # checkout + artifacts
-  id-token: write     # PyPI Trusted Publishing
+  contents: read
+  pull-requests: write     # <-- NEW: matches ci.yml needs
+  id-token: write
 
 jobs:
   # Re-run your full CI on the tag
@@ -25,6 +25,13 @@ jobs:
     needs: ci            # blocks if CI failed
     runs-on: ubuntu-latest
     steps:
+      - name: Build wheel & sdist
+        run: python -m build --sdist --wheel --outdir dist/
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
       - uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
