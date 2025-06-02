@@ -23,7 +23,7 @@ def small_tabular_data(random_state):
         n_informative=5,
         n_redundant=2,
         n_classes=2,
-        random_state=random_state
+        random_state=random_state,
     )
     return X, y
 
@@ -59,14 +59,18 @@ def trained_image_model(small_image_data, random_state):
 @pytest.fixture
 def predict_fn_tabular(trained_tabular_model):
     """Prediction function for tabular model."""
+
     def predict_fn(X):
         return trained_tabular_model.predict_proba(X)
+
     return predict_fn
 
 
 @pytest.fixture
 def predict_fn_image(trained_image_model):
     """Prediction function for image model."""
+
     def predict_fn(X):
         return trained_image_model.predict_proba(X)
-    return predict_fn 
+
+    return predict_fn

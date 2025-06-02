@@ -14,7 +14,7 @@ from .superpixel import SuperpixelSimplification
 __all__ = [
     "BaseSimplification",
     "SimplificationRegistry",
-    "NoSimplification", 
+    "NoSimplification",
     "LowRankSimplification",
-    "SuperpixelSimplification"
-] 
+    "SuperpixelSimplification",
+]

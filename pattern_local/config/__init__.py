@@ -7,8 +7,8 @@ from .validation import ParameterValidator
 
 __all__ = [
     "ExplainerConfig",
-    "LimeConfig", 
+    "LimeConfig",
     "SimplificationConfig",
     "SolverConfig",
-    "ParameterValidator"
-] 
+    "ParameterValidator",
+]

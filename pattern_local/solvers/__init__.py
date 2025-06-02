@@ -18,7 +18,7 @@ __all__ = [
     "SolverRegistry",
     "NoSolver",
     "GlobalCovarianceSolver",
-    "LocalCovarianceSolver", 
+    "LocalCovarianceSolver",
     "LassoSolver",
-    "RidgeSolver"
-] 
+    "RidgeSolver",
+]

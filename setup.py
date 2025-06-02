@@ -53,7 +53,7 @@ setup(
             "matplotlib>=3.3.0",
             "jupyter>=1.0.0",
             "seaborn>=0.11.0",
-        ]
+        ],
     },
     keywords="explainable-ai, machine-learning, pattern-analysis, lime, interpretability",
     project_urls={
@@ -64,4 +64,4 @@ setup(
             "pattern-local-demo=pattern_local.examples.demo:main",
         ],
     },
-) 
+)

@@ -8,7 +8,7 @@ parallel processing, and fluent interface.
 
 Examples:
     >>> from pattern_local import PatternLocalExplainer
-    >>> 
+    >>>
     >>> # Basic usage
     >>> explainer = PatternLocalExplainer(
     ...     simplification='lowrank',
@@ -16,17 +16,17 @@ Examples:
     ... )
     >>> explainer.fit(X_train)
     >>> explanation = explainer.explain_instance(instance, predict_fn, X_train)
-    >>> 
+    >>>
     >>> # Fluent interface
     >>> explainer = (PatternLocalExplainer()
     ...              .with_simplification('lowrank', n_components=10)
     ...              .with_solver('local_covariance', k_ratio=0.1)
     ...              .with_caching(enabled=True)
     ...              .fit(X_train))
-    >>> 
+    >>>
     >>> # Configuration from file
     >>> explainer = PatternLocalExplainer.from_config('config.yaml')
-    >>> 
+    >>>
     >>> # Batch processing
     >>> explanations = explainer.explain_batch(
     ...     instances, predict_fn, X_train, n_jobs=4
@@ -39,10 +39,10 @@ from .core.explainer import PatternLocalExplainer
 # Configuration classes
 from .config import (
     ExplainerConfig,
-    LimeConfig, 
+    LimeConfig,
     SimplificationConfig,
     SolverConfig,
-    ParameterValidator
+    ParameterValidator,
 )
 
 # Base classes
@@ -52,8 +52,8 @@ from .solvers.base import BaseSolver
 # Simplification methods
 from .simplification import (
     NoSimplification,
-    LowRankSimplification, 
-    SuperpixelSimplification
+    LowRankSimplification,
+    SuperpixelSimplification,
 )
 
 # Solvers
@@ -62,7 +62,7 @@ from .solvers import (
     GlobalCovarianceSolver,
     LocalCovarianceSolver,
     LassoSolver,
-    RidgeSolver
+    RidgeSolver,
 )
 
 # Registries
@@ -76,7 +76,7 @@ from .utils import (
     epanechnikov_kernel,
     uniform_kernel,
     project_point_onto_hyperplane,
-    ParallelProcessor
+    ParallelProcessor,
 )
 
 # Parallel processing functions
@@ -84,7 +84,7 @@ from .utils.parallel import (
     parallel_explain_instances,
     parallel_fit_simplifications,
     parallel_solver_comparison,
-    parallel_cross_validation
+    parallel_cross_validation,
 )
 
 # Exceptions
@@ -94,7 +94,7 @@ from .exceptions import (
     ExplanationError,
     ValidationError,
     FittingError,
-    ComputationalError
+    ComputationalError,
 )
 
 # Package metadata
@@ -106,61 +106,53 @@ __description__ = "Advanced pattern-based explanations with modern architecture"
 __all__ = [
     # Main explainer
     "PatternLocalExplainer",
-    
     # Configuration
     "ExplainerConfig",
-    "LimeConfig", 
+    "LimeConfig",
     "SimplificationConfig",
     "SolverConfig",
     "ParameterValidator",
-    
     # Base classes
     "BaseSimplification",
     "BaseSolver",
-    
     # Simplification methods
-    "NoSimplification", 
+    "NoSimplification",
     "LowRankSimplification",
     "SuperpixelSimplification",
-    
     # Solvers
     "NoSolver",
-    "GlobalCovarianceSolver", 
+    "GlobalCovarianceSolver",
     "LocalCovarianceSolver",
     "LassoSolver",
     "RidgeSolver",
-    
     # Registries
     "SimplificationRegistry",
     "SolverRegistry",
-    
     # Utilities
     "calculate_distances",
     "gaussian_kernel",
-    "epanechnikov_kernel", 
+    "epanechnikov_kernel",
     "uniform_kernel",
     "project_point_onto_hyperplane",
     "ParallelProcessor",
-    
     # Parallel functions
     "parallel_explain_instances",
     "parallel_fit_simplifications",
     "parallel_solver_comparison",
     "parallel_cross_validation",
-    
     # Exceptions
     "PatternLocalError",
     "ConfigurationError",
     "ExplanationError",
     "ValidationError",
     "FittingError",
-    "ComputationalError"
+    "ComputationalError",
 ]
 
 
 def list_simplification_methods():
     """List all available simplification methods.
-    
+
     Returns:
         List of available simplification method names
     """
@@ -169,7 +161,7 @@ def list_simplification_methods():
 
 def list_solvers():
     """List all available solver methods.
-    
+
     Returns:
         List of available solver method names
     """
@@ -178,16 +170,16 @@ def list_solvers():
 
 def get_package_info():
     """Get information about the package.
-    
+
     Returns:
         Dictionary with package information
     """
     return {
-        'version': __version__,
-        'author': __author__,
-        'description': __description__,
-        'simplification_methods': list_simplification_methods(),
-        'solver_methods': list_solvers()
+        "version": __version__,
+        "author": __author__,
+        "description": __description__,
+        "simplification_methods": list_simplification_methods(),
+        "solver_methods": list_solvers(),
     }
 
 
@@ -198,5 +190,6 @@ def _register_builtin_methods():
     from .simplification import no_simplification, lowrank, superpixel
     from .solvers import no_solver, local_covariance, global_covariance, lasso, ridge
 
+
 # Register built-in methods
-_register_builtin_methods() 
+_register_builtin_methods()
