@@ -1,6 +1,6 @@
-# PatternLocal: Unified Pattern-based Explanations
+# PatternLocal
 
-PatternLocal is a comprehensive Python package for generating local explanations using pattern-based methods. It provides a clean, modular interface that unifies various pattern computation approaches with different data preprocessing techniques for **both tabular and image data**.
+PatternLocal is a comprehensive Python package for generating local explanations using PatternLocal method. It provides a clean, modular interface with different data preprocessing techniques for **both tabular and image data**.
 
 ## Features
 
@@ -16,7 +16,7 @@ PatternLocal is a comprehensive Python package for generating local explanations
   - `LowRankSimplification`: PCA-based dimensionality reduction
   - `SuperpixelSimplification`: Image segmentation for computer vision
 
-- **Pattern Solvers**: Different approaches to compute patterns
+- **PatternLocal Solvers**: Different approaches to compute patterns
   - `NoSolver`: Return LIME weights (baseline)
   - `GlobalCovarianceSolver`: Global covariance baseline
   - `LocalCovarianceSolver`: Local weighted covariance (main pattern method)
@@ -59,9 +59,9 @@ explanation = explainer.explain_instance(instance, predict_fn, X_train, labels=[
 
 ### From Source
 ```bash
-git clone <repository-url>
-cd PatternXAI
-pip install -e src/pattern_local
+git clone https://github.com/gjoelbye/PatternLocal.git
+cd PatternLocal
+pip install -e .
 ```
 
 ### Dependencies
@@ -218,7 +218,7 @@ explainer = PatternLocalExplainer(
 ### SuperpixelSimplification (Image Data)
 Segments images into superpixels for more interpretable explanations.
 
-**SLIC Segmentation (Recommended):**
+**SLIC Segmentation:**
 ```python
 explainer = PatternLocalExplainer(
     simplification='superpixel',
@@ -233,7 +233,7 @@ explainer = PatternLocalExplainer(
 )
 ```
 
-**Grid Segmentation (Fast):**
+**Grid Segmentation:**
 ```python
 explainer = PatternLocalExplainer(
     simplification='superpixel',
@@ -247,12 +247,12 @@ explainer = PatternLocalExplainer(
 )
 ```
 
-## Pattern Solvers
+## PatternLocal Solvers
 
 All solvers work with both tabular and image data:
 
 ### LocalCovarianceSolver (Recommended)
-The main pattern method - estimates local covariance matrices.
+The main patternlocal method - estimates local covariance matrices.
 ```python
 solver_params = {
     'k_ratio': 0.1,                  # Use 10% of training data
@@ -264,7 +264,7 @@ solver_params = {
 ```
 
 ### LassoSolver
-Uses local Lasso regression to find patterns.
+Uses local Lasso regression.
 ```python
 solver_params = {
     'alpha': 1.0,                    # Lasso regularization
@@ -273,7 +273,7 @@ solver_params = {
 ```
 
 ### RidgeSolver
-Uses local Ridge regression to find patterns.
+Uses local Ridge regression.
 ```python
 solver_params = {
     'alpha': 1.0,                    # Ridge regularization
@@ -426,7 +426,7 @@ visualize_explanation(
 
 ### PatternLocalExplainer
 
-Main class for pattern-based explanations supporting both tabular and image data.
+Main class for patternlocal explanations supporting both tabular and image data.
 
 **Parameters:**
 - `simplification`: str or BaseSimplification instance
@@ -449,7 +449,7 @@ Main class for pattern-based explanations supporting both tabular and image data
 
 **Returns (explain_instance):**
 Dictionary with keys:
-- `'pattern_weights'`: Pattern explanation weights
+- `'pattern_weights'`: PatternLocal explanation weights
 - `'lime_weights'`: Original LIME weights
 - `'lime_intercept'`: LIME intercept
 - `'local_exp'`: LIME explanation object
@@ -475,62 +475,19 @@ python examples/pattern_local_demo.py      # Tabular examples
 python examples/image_mode_demo.py         # Image examples
 ```
 
-## Troubleshooting
-
-### Common Issues
-
-**For Both Modes:**
-1. **Import errors**: Make sure all dependencies are installed
-2. **Poor explanation quality**: Try different solvers or adjust parameters
-
-**For Image Mode:**
-1. **"Image mode requires SuperpixelSimplification"**
-   - Set `simplification='superpixel'` and `lime_params={'mode': 'image'}`
-
-2. **"image_shape must be provided"**
-   - Include `image_shape` in `simplification_params` and when calling `fit()`
-
-3. **scikit-image ImportError**
-   - Install with: `pip install scikit-image`
-
-### Performance Tips
-
-**General:**
-- Use `solver='none'` for LIME-only explanations (faster)
-- Reduce `num_samples` for faster computation
-- Use smaller `k_ratio` for pattern solvers
-
-**For Images:**
-- Use grid segmentation instead of SLIC for speed
-- Reduce number of segments for simpler explanations
-- Consider using smaller images for development
-
-## Theory
-
-PatternLocal implements the pattern-based explanation framework where explanations are computed as:
-
-**a = w ⊙ C**
-
-Where:
-- **w** are LIME weights (local linear explanation)
-- **C** is a pattern matrix (estimated using various methods)
-- **a** are the final pattern-based explanation weights
-
-The framework works identically for tabular and image data, with the main differences being:
-- **Data representation**: Raw features vs. superpixel segments
-- **LIME explainer**: Tabular vs. image explainer
-- **Preprocessing**: Feature transformation vs. image segmentation
-
 ## Citation
 
 If you use PatternLocal in your research, please cite:
 
 ```bibtex
-@software{pattern_local,
-  title={PatternLocal: Unified Pattern-based Explanations},
-  author={PatternXAI Team},
-  year={2024},
-  url={https://github.com/your-repo/PatternXAI}
+@misc{gjølbye2025minimizingfalsepositiveattributionsexplanations,
+      title={Minimizing False-Positive Attributions in Explanations of Non-Linear Models}, 
+      author={Anders Gjølbye and Stefan Haufe and Lars Kai Hansen},
+      year={2025},
+      eprint={2505.11210},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2505.11210}, 
 }
 ```
 
@@ -545,6 +502,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Built on top of the excellent [LIME](https://github.com/marcotcr/lime) package
-- Uses scikit-learn for machine learning utilities
-- Uses scikit-image for superpixel segmentation
-- Inspired by research in interpretable machine learning and local explanations 
