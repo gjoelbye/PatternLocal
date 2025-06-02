@@ -98,7 +98,11 @@ class PatternLocalExplainer:
         self._X_train_simplified = None
         self.is_fitted = False
 
-    def _initialize_components(self, simplification, solver):
+    def _initialize_components(
+        self, 
+        simplification: Union[str, BaseSimplification], 
+        solver: Union[str, BaseSolver]
+    ) -> None:
         """Initialize simplification and solver components."""
         self.logger.info("Initializing PatternLocalExplainer components")
 
@@ -148,7 +152,7 @@ class PatternLocalExplainer:
 
     def _create_simplification_legacy(
         self, simplification: str, params: Optional[Dict[str, Any]]
-    ):
+    ) -> BaseSimplification:
         """Legacy simplification creation for backward compatibility."""
         from ..simplification import (
             LowRankSimplification,
@@ -167,7 +171,9 @@ class PatternLocalExplainer:
         else:
             raise ConfigurationError(f"Unknown simplification method: {simplification}")
 
-    def _create_solver_legacy(self, solver: str, params: Optional[Dict[str, Any]]):
+    def _create_solver_legacy(
+        self, solver: str, params: Optional[Dict[str, Any]]
+    ) -> BaseSolver:
         """Legacy solver creation for backward compatibility."""
         from ..solvers import (
             GlobalCovarianceSolver,
@@ -211,7 +217,7 @@ class PatternLocalExplainer:
         else:
             raise ConfigurationError(f"Invalid config type: {type(config)}")
 
-    def with_simplification(self, method: str, **params) -> "PatternLocalExplainer":
+    def with_simplification(self, method: str, **params: Any) -> "PatternLocalExplainer":
         """Set simplification method using fluent interface.
 
         Args:
@@ -233,7 +239,7 @@ class PatternLocalExplainer:
 
         return self
 
-    def with_solver(self, method: str, **params) -> "PatternLocalExplainer":
+    def with_solver(self, method: str, **params: Any) -> "PatternLocalExplainer":
         """Set solver using fluent interface.
 
         Args:
@@ -250,7 +256,7 @@ class PatternLocalExplainer:
 
         return self
 
-    def with_lime_params(self, **params) -> "PatternLocalExplainer":
+    def with_lime_params(self, **params: Any) -> "PatternLocalExplainer":
         """Set LIME parameters using fluent interface.
 
         Args:
@@ -269,7 +275,7 @@ class PatternLocalExplainer:
         return self
 
     @validate_array_input
-    def fit(self, X_train: np.ndarray, **kwargs) -> "PatternLocalExplainer":
+    def fit(self, X_train: np.ndarray, **kwargs: Any) -> "PatternLocalExplainer":
         """Fit the explainer to training data.
 
         Args:

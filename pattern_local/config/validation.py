@@ -19,11 +19,11 @@ class PredictFunction(Protocol):
     def __call__(self, X: np.ndarray) -> np.ndarray: ...
 
 
-def validate_fitted(func):
+def validate_fitted(func: Callable) -> Callable:
     """Decorator to validate that explainer is fitted before method call."""
 
     @wraps(func)
-    def wrapper(self, *args, **kwargs):
+    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
         if not getattr(self, "is_fitted", False):
             raise ValidationError(f"{func.__name__} requires fitted explainer")
         return func(self, *args, **kwargs)
@@ -31,11 +31,11 @@ def validate_fitted(func):
     return wrapper
 
 
-def validate_array_input(func):
+def validate_array_input(func: Callable) -> Callable:
     """Decorator to validate numpy array inputs."""
 
     @wraps(func)
-    def wrapper(self, *args, **kwargs):
+    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
         for i, arg in enumerate(args):
             if isinstance(arg, np.ndarray):
                 if arg.size == 0:

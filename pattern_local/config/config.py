@@ -29,7 +29,7 @@ class LimeConfig:
     verbose: bool = False
     labels: Optional[list] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         if self.num_samples <= 0:
             raise ConfigurationError("num_samples must be positive")
@@ -77,7 +77,7 @@ class SimplificationConfig:
     method: str = "none"
     params: Dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration."""
         # Import here to avoid circular imports
         from ..simplification.registry import SimplificationRegistry
@@ -97,7 +97,7 @@ class SolverConfig:
     method: str = "local_covariance"
     params: Dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration."""
         # Import here to avoid circular imports
         from ..solvers.registry import SolverRegistry
@@ -124,7 +124,7 @@ class ExplainerConfig:
     enable_parallel: bool = False
     n_jobs: int = 1
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate and normalize configuration."""
         self.validate()
         self._normalize_configs()
@@ -140,7 +140,7 @@ class ExplainerConfig:
         if self.random_state is not None and self.random_state < 0:
             raise ConfigurationError("random_state must be non-negative")
 
-    def _normalize_configs(self):
+    def _normalize_configs(self) -> None:
         """Normalize configuration objects."""
         # Normalize LIME config
         if isinstance(self.lime_params, dict):

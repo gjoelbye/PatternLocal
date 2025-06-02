@@ -5,6 +5,8 @@ black>=21.0
 isort>=5.0
 flake8>=3.8
 mypy>=0.900
+flake8-pyproject>=1.0.0
+types-PyYAML
 pre-commit>=2.0
 
 # Documentation
