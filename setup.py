@@ -10,7 +10,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="patternlocal",
-    version="1.0.0",
+    version="1.0.1",
     author="Anders Gjølbye",
     author_email="agjma@dtu.com",
     description="PatternLocal explanations for machine learning models",
