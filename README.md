@@ -480,7 +480,7 @@ python examples/image_mode_demo.py         # Image examples
 If you use PatternLocal in your research, please cite:
 
 ```bibtex
-@misc{gjølbye2025minimizingfalsepositiveattributionsexplanations,
+@misc{gjoelbye2025patternlocal,
       title={Minimizing False-Positive Attributions in Explanations of Non-Linear Models}, 
       author={Anders Gjølbye and Stefan Haufe and Lars Kai Hansen},
       year={2025},
