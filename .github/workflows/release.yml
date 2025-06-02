@@ -1,9 +1,13 @@
 name: Release
 
 on:
-  push:
-    tags: ['v*']
+  pull_request:
+    branches: ['main']
 
+  push:
+    tags:
+      - 'v*'
+      
 permissions:
   contents: read
   id-token: write   # keep if you migrate to Trusted Publishing
