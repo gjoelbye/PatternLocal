@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"          # any tag that starts with v
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read      # checkout + artifacts
+  id-token: write     # PyPI Trusted Publishing
+
+jobs:
+  # Re-run your full CI on the tag
+  ci:
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit     # pass repo secrets through
+
+  # Publish only if CI passed
+  publish:
+    name: Publish to PyPI
+    needs: ci            # blocks if CI failed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
