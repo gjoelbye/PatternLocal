@@ -1,6 +1,6 @@
 # PatternLocal
 
-PatternLocal is a comprehensive Python package for generating local explanations using PatternLocal method. It provides a clean, modular interface with different data preprocessing techniques for **both tabular and image data**. See the [main paper][https://arxiv.org/abs/2505.11210] for details.
+PatternLocal is a comprehensive Python package for generating local explanations using PatternLocal method. It provides a clean, modular interface with different data preprocessing techniques for **both tabular and image data**. See the [main paper](https://arxiv.org/abs/2505.11210) for details.
 
 ## Features
 
