@@ -2,9 +2,9 @@ name: Publish
 
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: ["CI"]       # Runs after your CI workflow
     types:
-      - completed
+      - completed           # …when that workflow has finished
 
 jobs:
   publish:
@@ -15,10 +15,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code from tag
+      # (Optional) Quick debug of incoming values – remove when happy
+      - name: Show trigger values
+        run: |
+          echo "conclusion  = ${{ github.event.workflow_run.conclusion }}"
+          echo "head_branch = ${{ github.event.workflow_run.head_branch }}"
+
+      - name: Check out the code from the tag
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.workflow_run.head_branch }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -31,12 +37,10 @@ jobs:
           pip install build twine
 
       - name: Build package
-        run: |
-          python -m build
+        run: python -m build
 
       - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          twine upload dist/*
+        run: twine upload dist/*
