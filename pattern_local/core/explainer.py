@@ -99,9 +99,9 @@ class PatternLocalExplainer:
         self.is_fitted = False
 
     def _initialize_components(
-        self, 
-        simplification: Union[str, BaseSimplification], 
-        solver: Union[str, BaseSolver]
+        self,
+        simplification: Union[str, BaseSimplification],
+        solver: Union[str, BaseSolver],
     ) -> None:
         """Initialize simplification and solver components."""
         self.logger.info("Initializing PatternLocalExplainer components")
@@ -217,7 +217,9 @@ class PatternLocalExplainer:
         else:
             raise ConfigurationError(f"Invalid config type: {type(config)}")
 
-    def with_simplification(self, method: str, **params: Any) -> "PatternLocalExplainer":
+    def with_simplification(
+        self, method: str, **params: Any
+    ) -> "PatternLocalExplainer":
         """Set simplification method using fluent interface.
 
         Args:

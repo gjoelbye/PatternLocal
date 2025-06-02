@@ -4,7 +4,7 @@ Strategy pattern implementations for LIME mode detection and explanation generat
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional, Union, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
 
 import numpy as np
 from lime import lime_image, lime_tabular
@@ -152,7 +152,9 @@ class TabularModeStrategy(LimeModeStrategy):
             num_features=num_features,
         )
 
-    def extract_explanation(self, explanation: Any, num_features: int) -> Tuple[np.ndarray, float]:
+    def extract_explanation(
+        self, explanation: Any, num_features: int
+    ) -> Tuple[np.ndarray, float]:
         """Extract weights and intercept from tabular explanation."""
         # Get the explanation for the first class (assuming binary/regression)
         local_exp = explanation.local_exp[list(explanation.local_exp.keys())[0]]
@@ -292,7 +294,9 @@ class ImageModeStrategy(LimeModeStrategy):
             random_seed=kwargs.get("random_state"),
         )
 
-    def extract_explanation(self, explanation: Any, num_features: int) -> Tuple[np.ndarray, float]:
+    def extract_explanation(
+        self, explanation: Any, num_features: int
+    ) -> Tuple[np.ndarray, float]:
         """Extract weights and intercept from image explanation."""
         # Image explanations structure: explanation.local_exp[label] contains
         # (segment_id, weight) pairs
@@ -318,7 +322,7 @@ class StrategyFactory:
 
     _strategies: Dict[str, type[LimeModeStrategy]] = {
         "tabular": TabularModeStrategy,
-        "image": ImageModeStrategy
+        "image": ImageModeStrategy,
     }
 
     @classmethod

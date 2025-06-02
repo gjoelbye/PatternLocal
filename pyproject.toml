@@ -23,6 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
@@ -33,10 +34,10 @@ dependencies = [
     "scikit-learn>=1.0.0",
     "scipy>=1.7.0",
     "lime>=0.2.0",
+    "scikit-image>=0.18.0",
 ]
 
 [project.optional-dependencies]
-superpixel = ["scikit-image>=0.18.0"]
 dev = [
     "pytest>=6.0",
     "pytest-cov>=2.0",
@@ -50,11 +51,6 @@ examples = [
     "matplotlib>=3.3.0",
     "jupyter>=1.0.0",
     "seaborn>=0.11.0",
-]
-docs = [
-    "sphinx>=4.0",
-    "sphinx-rtd-theme>=1.0",
-    "sphinx-autodoc-typehints>=1.12",
 ]
 
 [project.urls]

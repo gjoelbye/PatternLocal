@@ -18,7 +18,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 ### 3. Install Development Dependencies
 ```bash
-pip install -e ".[dev,superpixel,examples]"
+pip install -e .
 # Or use requirements-dev.txt
 pip install -r requirements-dev.txt
 ```
@@ -36,7 +36,6 @@ We use several tools to maintain code quality:
 - **Black** for code formatting
 - **isort** for import sorting
 - **flake8** for linting
-- **mypy** for type checking
 
 Run all checks:
 ```bash
@@ -87,7 +86,6 @@ pytest pattern_local/tests/test_unified_api.py
    black --check pattern_local examples
    isort --check-only pattern_local examples
    flake8 pattern_local examples
-   mypy pattern_local
    ```
 
 ## Types of Contributions
@@ -153,14 +151,6 @@ pytest pattern_local/tests/test_unified_api.py
 - [ ] Type hints added
 - [ ] Examples updated if needed
 
-## Questions?
-
-- Open an issue for questions
-- Check existing issues and PRs
-- Contact maintainers if needed
-
 ## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
-
-Thank you for contributing to PatternLocal! 🎉 
