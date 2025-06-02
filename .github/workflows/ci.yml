@@ -72,6 +72,12 @@ jobs:
         run: |
           pytest --cov=pattern_local
 
+      - name: Show trigger values
+        run: |
+          echo "conclusion  = ${{ github.event.workflow_run.conclusion }}"
+          echo "head_branch = ${{ github.event.workflow_run.head_branch }}"
+
+
   # typecheck:
   #   name: Static type‑checking (mypy)
   #   needs: tests

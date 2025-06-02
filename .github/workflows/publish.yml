@@ -15,12 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # (Optional) Quick debug of incoming values – remove when happy
-      - name: Show trigger values
-        run: |
-          echo "conclusion  = ${{ github.event.workflow_run.conclusion }}"
-          echo "head_branch = ${{ github.event.workflow_run.head_branch }}"
-
       - name: Check out the code from the tag
         uses: actions/checkout@v4
         with:
