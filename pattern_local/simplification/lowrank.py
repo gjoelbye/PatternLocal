@@ -2,14 +2,15 @@
 Low-rank simplification using PCA.
 """
 
+from typing import Any, Callable, Dict, Optional
+
 import numpy as np
-from typing import Any, Dict, Callable, Optional
 from sklearn.decomposition import PCA
 
-from .base import BaseSimplification
-from .registry import SimplificationRegistry
 from ..config.validation import ParameterValidator, validate_array_input
 from ..exceptions import ValidationError
+from .base import BaseSimplification
+from .registry import SimplificationRegistry
 
 
 @SimplificationRegistry.register("lowrank")
@@ -178,4 +179,4 @@ class LowRankSimplification(BaseSimplification):
             return None
 
         n_components = self.n_components_
-        return [f"PC{i+1}" for i in range(n_components)]
+        return [f"PC{i + 1}" for i in range(n_components)]

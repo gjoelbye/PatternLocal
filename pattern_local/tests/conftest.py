@@ -2,10 +2,10 @@
 Pytest configuration and shared fixtures for PatternLocal tests.
 """
 
-import pytest
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
+import pytest
 from sklearn.datasets import make_classification
+from sklearn.ensemble import RandomForestClassifier
 
 
 @pytest.fixture

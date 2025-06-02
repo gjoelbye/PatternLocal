@@ -2,13 +2,14 @@
 Lasso solver for patternlocal computation.
 """
 
-import numpy as np
 from typing import Any, Dict, Optional
+
+import numpy as np
 from sklearn.linear_model import Lasso
 
+from ..exceptions import ComputationalError
 from .local_base import LocalSolverBase
 from .registry import SolverRegistry
-from ..exceptions import ComputationalError
 
 
 @SolverRegistry.register("lasso")
@@ -71,7 +72,8 @@ class LassoSolver(LocalSolverBase):
             y_target = X_local @ lime_weights + lime_intercept
 
             # Fit Lasso model: X_local (features) -> y_target (LIME predictions)
-            # We want to find coefficients that map features to LIME predictions
+            # We want to find coefficients that map features to LIME
+            # predictions
             lasso = Lasso(
                 alpha=self.alpha,
                 fit_intercept=self.fit_intercept,

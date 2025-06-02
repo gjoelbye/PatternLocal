@@ -33,68 +33,68 @@ Examples:
     ... )
 """
 
-# Main explainer class
-from .core.explainer import PatternLocalExplainer
-
 # Configuration classes
 from .config import (
     ExplainerConfig,
     LimeConfig,
+    ParameterValidator,
     SimplificationConfig,
     SolverConfig,
-    ParameterValidator,
+)
+
+# Main explainer class
+from .core.explainer import PatternLocalExplainer
+
+# Exceptions
+from .exceptions import (
+    ComputationalError,
+    ConfigurationError,
+    ExplanationError,
+    FittingError,
+    PatternLocalError,
+    ValidationError,
+)
+
+# Simplification methods
+from .simplification import (
+    LowRankSimplification,
+    NoSimplification,
+    SuperpixelSimplification,
 )
 
 # Base classes
 from .simplification.base import BaseSimplification
-from .solvers.base import BaseSolver
-
-# Simplification methods
-from .simplification import (
-    NoSimplification,
-    LowRankSimplification,
-    SuperpixelSimplification,
-)
-
-# Solvers
-from .solvers import (
-    NoSolver,
-    GlobalCovarianceSolver,
-    LocalCovarianceSolver,
-    LassoSolver,
-    RidgeSolver,
-)
 
 # Registries
 from .simplification.registry import SimplificationRegistry
+
+# Solvers
+from .solvers import (
+    GlobalCovarianceSolver,
+    LassoSolver,
+    LocalCovarianceSolver,
+    NoSolver,
+    RidgeSolver,
+)
+from .solvers.base import BaseSolver
 from .solvers.registry import SolverRegistry
 
 # Utilities
 from .utils import (
-    calculate_distances,
-    gaussian_kernel,
-    epanechnikov_kernel,
-    uniform_kernel,
-    project_point_onto_hyperplane,
     ParallelProcessor,
+    calculate_distances,
+    epanechnikov_kernel,
+    gaussian_kernel,
+    project_point_onto_hyperplane,
+    uniform_kernel,
 )
 
 # Parallel processing functions
 from .utils.parallel import (
+    parallel_cross_validation,
     parallel_explain_instances,
     parallel_fit_simplifications,
     parallel_solver_comparison,
-    parallel_cross_validation,
-)
-
-# Exceptions
-from .exceptions import (
-    PatternLocalError,
-    ConfigurationError,
-    ExplanationError,
-    ValidationError,
-    FittingError,
-    ComputationalError,
 )
 
 # Package metadata
@@ -187,8 +187,6 @@ def get_package_info():
 def _register_builtin_methods():
     """Register built-in simplification and solver methods."""
     # Import to trigger registration decorators
-    from .simplification import no_simplification, lowrank, superpixel
-    from .solvers import no_solver, local_covariance, global_covariance, lasso, ridge
 
 
 # Register built-in methods

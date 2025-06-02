@@ -6,9 +6,8 @@ with different simplification methods and pattern solvers.
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer, make_classification
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import make_classification, load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -122,7 +121,9 @@ def demo_different_solvers():
 
         results[solver_name] = explanation["pattern_weights"]
         print(
-            f"  Weight magnitude: {np.linalg.norm(explanation['pattern_weights']):.3f}"
+            f"  Weight magnitude: {
+                np.linalg.norm(
+                    explanation['pattern_weights']):.3f}"
         )
 
     print()
@@ -189,13 +190,21 @@ def demo_lowrank_simplification():
             instance=instance, predict_fn=predict_fn, X_train=X_train
         )
 
-        print(f"  Pattern weights shape: {explanation['pattern_weights'].shape}")
         print(
-            f"  Weight magnitude: {np.linalg.norm(explanation['pattern_weights']):.3f}"
+            f"  Pattern weights shape: {
+                explanation['pattern_weights'].shape}"
+        )
+        print(
+            f"  Weight magnitude: {
+                np.linalg.norm(
+                    explanation['pattern_weights']):.3f}"
         )
 
         if hasattr(explainer.simplification, "n_components_fitted"):
-            print(f"  PCA components: {explainer.simplification.n_components_fitted}")
+            print(
+                f"  PCA components: {
+                    explainer.simplification.n_components_fitted}"
+            )
 
     print()
 
@@ -248,12 +257,16 @@ def demo_custom_parameters():
         num_samples=15000,  # Override default
     )
 
-    print(f"Custom configuration results:")
+    print("Custom configuration results:")
     print(
-        f"  Pattern weights magnitude: {np.linalg.norm(explanation['pattern_weights']):.3f}"
+        f"  Pattern weights magnitude: {
+            np.linalg.norm(
+                explanation['pattern_weights']):.3f}"
     )
     print(
-        f"  LIME weights magnitude: {np.linalg.norm(explanation['lime_weights']):.3f}"
+        f"  LIME weights magnitude: {
+            np.linalg.norm(
+                explanation['lime_weights']):.3f}"
     )
     print(f"  Simplification method: {explainer.simplification_method}")
     print(f"  Solver method: {explainer.solver_method}")
@@ -319,7 +332,7 @@ def demo_real_dataset():
         for i, idx in enumerate(top_indices):
             feature_name = data.feature_names[idx]
             weight = pattern_weights[idx]
-            print(f"  {i+1}. {feature_name}: {weight:.3f}")
+            print(f"  {i + 1}. {feature_name}: {weight:.3f}")
         print()
 
 

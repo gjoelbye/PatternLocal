@@ -2,9 +2,8 @@
 Registry for simplification methods.
 """
 
-from .base import BaseSimplification
 from ..utils.registry import BaseRegistry
-
+from .base import BaseSimplification
 
 # Create singleton registry instance
 _registry = BaseRegistry(BaseSimplification, "simplification")

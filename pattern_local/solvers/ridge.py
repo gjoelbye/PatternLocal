@@ -2,13 +2,14 @@
 Ridge solver for patternlocal computation.
 """
 
-import numpy as np
 from typing import Any, Dict, Optional
+
+import numpy as np
 from sklearn.linear_model import Ridge
 
+from ..exceptions import ComputationalError
 from .local_base import LocalSolverBase
 from .registry import SolverRegistry
-from ..exceptions import ComputationalError
 
 
 @SolverRegistry.register("ridge")
@@ -69,7 +70,8 @@ class RidgeSolver(LocalSolverBase):
             y_target = X_local @ lime_weights + lime_intercept
 
             # Fit Ridge model: X_local (features) -> y_target (LIME predictions)
-            # We want to find coefficients that map features to LIME predictions
+            # We want to find coefficients that map features to LIME
+            # predictions
             ridge = Ridge(alpha=self.alpha, fit_intercept=self.fit_intercept)
 
             # Fit Ridge with sample weights

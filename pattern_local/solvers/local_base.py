@@ -2,13 +2,15 @@
 Base class for local solvers to eliminate duplicate code.
 """
 
+from typing import Any, Dict, Optional
+
 import numpy as np
-from typing import Any, Dict, Optional, Callable
-from .base import BaseSolver
+
+from ..exceptions import ComputationalError
 from ..utils.distance import calculate_distances
 from ..utils.kernels import gaussian_kernel
 from ..utils.projection import project_point_onto_hyperplane
-from ..exceptions import ComputationalError
+from .base import BaseSolver
 
 
 class LocalSolverBase(BaseSolver):
@@ -115,7 +117,8 @@ class LocalSolverBase(BaseSolver):
         elif isinstance(self.k_ratio, int):
             if self.k_ratio <= 0 or self.k_ratio > n_total_samples:
                 raise ValueError(
-                    "k_ratio must be a positive integer less than or equal to the number of samples."
+                    "k_ratio must be a positive integer less than \
+                        or equal to the number of samples."
                 )
             k = self.k_ratio
         else:

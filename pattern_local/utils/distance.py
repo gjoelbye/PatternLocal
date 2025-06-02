@@ -2,10 +2,11 @@
 Distance calculation utilities.
 """
 
+from typing import Literal
+
 import numpy as np
-from typing import Union, Literal
-from sklearn.metrics.pairwise import euclidean_distances, manhattan_distances
 from scipy.spatial.distance import cdist
+from sklearn.metrics.pairwise import euclidean_distances, manhattan_distances
 
 DistanceMetric = Literal["euclidean", "manhattan", "cosine", "chebyshev", "minkowski"]
 

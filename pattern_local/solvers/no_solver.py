@@ -2,8 +2,10 @@
 No solver - returns LIME weights unchanged.
 """
 
-import numpy as np
 from typing import Any, Dict, Optional
+
+import numpy as np
+
 from .base import BaseSolver
 from .registry import SolverRegistry
 

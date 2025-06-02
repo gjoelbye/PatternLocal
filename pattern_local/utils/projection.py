@@ -2,8 +2,10 @@
 Projection utilities for geometric operations.
 """
 
-import numpy as np
 from typing import Optional
+
+import numpy as np
+
 from ..exceptions import ComputationalError
 
 
@@ -43,7 +45,8 @@ def project_point_onto_hyperplane(
 
         # Calculate the distance from point to hyperplane
         # Distance = (normal · point + intercept) / ||normal||
-        # Since normal is normalized (||normal|| = 1), distance = normal · point + intercept
+        # Since normal is normalized (||normal|| = 1), distance = normal ·
+        # point + intercept
         distance_to_plane = np.dot(normal, point) + intercept
 
         # Project point onto hyperplane

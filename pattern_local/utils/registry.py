@@ -2,8 +2,8 @@
 Generic registry base class to eliminate duplication.
 """
 
-from typing import Dict, Type, Any, Optional, TypeVar, Generic
-from abc import ABC
+from typing import Any, Dict, Generic, Optional, Type, TypeVar
+
 from ..exceptions import ConfigurationError
 
 T = TypeVar("T")
@@ -36,7 +36,9 @@ class BaseRegistry(Generic[T]):
         def wrapper(method_cls: Type[T]):
             if not issubclass(method_cls, self._base_class):
                 raise ConfigurationError(
-                    f"Class {method_cls.__name__} must inherit from {self._base_class.__name__}"
+                    f"Class {
+                        method_cls.__name__} must inherit from {
+                        self._base_class.__name__}"
                 )
             self._registry[name] = method_cls
             return method_cls
@@ -59,7 +61,8 @@ class BaseRegistry(Generic[T]):
         if name not in self._registry:
             available = list(self._registry.keys())
             raise ConfigurationError(
-                f"Unknown {self._registry_name} method: {name}. Available: {available}"
+                f"Unknown {
+                    self._registry_name} method: {name}. Available: {available}"
             )
 
         return self._registry[name](params)

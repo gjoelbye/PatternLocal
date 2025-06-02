@@ -2,10 +2,11 @@
 Parameter validation utilities.
 """
 
-import numpy as np
-from typing import Dict, Any, Callable, Optional, Union, Protocol
 import logging
 from functools import wraps
+from typing import Any, Callable, Dict, Optional, Protocol
+
+import numpy as np
 
 from ..exceptions import ValidationError
 
@@ -81,7 +82,10 @@ class ParameterValidator:
             raise ValidationError(f"{name} must be {ndim}-dimensional, got {arr.ndim}")
 
         if dtype is not None and arr.dtype != dtype:
-            raise ValidationError(f"{name} must have dtype {dtype}, got {arr.dtype}")
+            raise ValidationError(
+                f"{name} must have dtype {dtype}, got {
+                    arr.dtype}"
+            )
 
         if np.any(np.isnan(arr)):
             raise ValidationError(f"{name} contains NaN values")

@@ -1,6 +1,6 @@
 import numpy as np
-from skimage.segmentation import slic
 from skimage.color import gray2rgb
+from skimage.segmentation import slic
 
 
 def grid_segmentation(instance, dims=(64, 64), grid_rows=8, grid_cols=8):

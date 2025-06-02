@@ -2,8 +2,9 @@
 Kernel functions for weighting in pattern computation.
 """
 
+from typing import Callable
+
 import numpy as np
-from typing import Union, Callable
 
 
 def gaussian_kernel(distances: np.ndarray, bandwidth: float) -> np.ndarray:

@@ -2,13 +2,14 @@
 No simplification - identity transformation.
 """
 
-import numpy as np
-from typing import Callable, Dict, Any, Optional
+from typing import Any, Callable, Dict, Optional
 
-from .base import BaseSimplification
-from .registry import SimplificationRegistry
+import numpy as np
+
 from ..config.validation import ParameterValidator, validate_array_input
 from ..exceptions import ValidationError
+from .base import BaseSimplification
+from .registry import SimplificationRegistry
 
 
 @SimplificationRegistry.register("none")

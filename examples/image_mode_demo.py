@@ -6,19 +6,19 @@ when using superpixel simplification, providing a unified experience
 for both tabular and image data.
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.datasets import make_classification
+from pattern_local import PatternLocalExplainer
+import os
 
 # Import PatternLocal
 import sys
-import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from pattern_local import PatternLocalExplainer
 
 
 def create_sample_image_data(
@@ -98,19 +98,19 @@ def demo_unified_api():
     )
 
     # Fit explainer
-    print(f"\nFitting explainer...")
+    print("\nFitting explainer...")
     explainer.fit(X_train, image_shape=image_shape)
-    print(f"✓ Auto-detected mode: {explainer.mode}")
-    print(f"✓ Simplification: {explainer.simplification_method}")
-    print(f"✓ Solver: {explainer.solver_method}")
-    print(f"✓ Number of superpixels: {explainer.simplification.n_superpixels}")
+    print(f"  Auto-detected mode: {explainer.mode}")
+    print(f"  Simplification: {explainer.simplification_method}")
+    print(f"  Solver: {explainer.solver_method}")
+    print(f"  Number of superpixels: {explainer.simplification.n_superpixels}")
 
     # Select instance to explain
     instance = X_test[0]
     prediction = predict_fn(instance.reshape(1, -1))[0]
     true_label = y_test[0]
 
-    print(f"\nExplaining instance:")
+    print("\nExplaining instance:")
     print(f"True label: {true_label}")
     print(f"Predicted probabilities: {prediction}")
 
@@ -128,11 +128,17 @@ def demo_unified_api():
     lime_weights = explanation["lime_weights"]
     lime_intercept = explanation["lime_intercept"]
 
-    print(f"\nExplanation statistics:")
+    print("\nExplanation statistics:")
     print(
-        f"Pattern weights range: [{pattern_weights.min():.3f}, {pattern_weights.max():.3f}]"
+        f"Pattern weights range: [{
+            pattern_weights.min():.3f}, {
+            pattern_weights.max():.3f}]"
     )
-    print(f"LIME weights range: [{lime_weights.min():.3f}, {lime_weights.max():.3f}]")
+    print(
+        f"LIME weights range: [{
+            lime_weights.min():.3f}, {
+            lime_weights.max():.3f}]"
+    )
     print(f"LIME intercept: {lime_intercept:.3f}")
 
     # Visualize results
@@ -218,14 +224,15 @@ def demo_mode_comparison():
         random_state=42,
     )
     explainer_tab.fit(X_tabular)
-    print(f"  ✓ Mode: {explainer_tab.mode}")
-    print(f"  ✓ Simplification: {explainer_tab.simplification_method}")
+    print(f"    Mode: {explainer_tab.mode}")
+    print(f"    Simplification: {explainer_tab.simplification_method}")
 
     explanation_tab = explainer_tab.explain_instance(
         X_tabular[0], predict_fn_tab, X_tabular
     )
     print(
-        f"  ✓ Generated explanation with shape: {explanation_tab['pattern_weights'].shape}"
+        f"    Generated explanation with shape: {
+            explanation_tab['pattern_weights'].shape}"
     )
 
     print("\nImage Mode (auto-detected):")
@@ -242,15 +249,19 @@ def demo_mode_comparison():
         random_state=42,
     )
     explainer_img.fit(X_image, image_shape=image_shape)
-    print(f"  ✓ Mode: {explainer_img.mode}")
-    print(f"  ✓ Simplification: {explainer_img.simplification_method}")
-    print(f"  ✓ Number of superpixels: {explainer_img.simplification.n_superpixels}")
+    print(f"    Mode: {explainer_img.mode}")
+    print(f"    Simplification: {explainer_img.simplification_method}")
+    print(
+        f"    Number of superpixels: {
+            explainer_img.simplification.n_superpixels}"
+    )
 
     explanation_img = explainer_img.explain_instance(
         X_image[0], predict_fn_img, X_image, labels=[1]
     )
     print(
-        f"  ✓ Generated explanation with shape: {explanation_img['pattern_weights'].shape}"
+        f"    Generated explanation with shape: {
+            explanation_img['pattern_weights'].shape}"
     )
 
 
@@ -299,7 +310,10 @@ def demo_different_solvers():
 
         pattern_weights = explanation["pattern_weights"]
         print(
-            f"  ✓ Mode: {explainer.mode} | Weights range: [{pattern_weights.min():.3f}, {pattern_weights.max():.3f}]"
+            f"    Mode: {
+                explainer.mode} | Weights range: [{
+                pattern_weights.min():.3f}, {
+                pattern_weights.max():.3f}]"
         )
 
 
@@ -311,9 +325,9 @@ if __name__ == "__main__":
 
     print("\n=== Demo Complete ===")
     print("\n🎉 Key Features Demonstrated:")
-    print("✓ Unified API works seamlessly for both tabular and image data")
-    print("✓ Automatic mode detection based on simplification type")
-    print("✓ No need to explicitly specify LIME mode in most cases")
-    print("✓ All solvers work with both data types")
-    print("✓ Consistent interface and parameters across modes")
+    print("  Unified API works seamlessly for both tabular and image data")
+    print("  Automatic mode detection based on simplification type")
+    print("  No need to explicitly specify LIME mode in most cases")
+    print("  All solvers work with both data types")
+    print("  Consistent interface and parameters across modes")
     print("\nThe implementation successfully unifies image and tabular modes!")

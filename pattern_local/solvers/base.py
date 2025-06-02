@@ -2,12 +2,12 @@
 Base class for patternlocal solvers.
 """
 
-import numpy as np
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Callable, Optional
+from typing import Any, Dict, Optional
+
+import numpy as np
 
 from ..config.validation import ParameterValidator
-from ..exceptions import ComputationalError
 
 
 class BaseSolver(ABC):
@@ -46,7 +46,6 @@ class BaseSolver(ABC):
         Returns:
             Patternlocal explanation weights
         """
-        pass
 
     def _validate_inputs(
         self,
@@ -82,9 +81,3 @@ class BaseSolver(ABC):
             Dictionary with patternlocal solver information
         """
         return {"type": self.solver_type, "params": self.params.copy()}
-
-
-class ComputationalError(Exception):
-    """Exception raised for computational errors in patternlocal solvers."""
-
-    pass

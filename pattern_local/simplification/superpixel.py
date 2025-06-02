@@ -2,12 +2,12 @@
 Superpixel simplification for image data.
 """
 
+from typing import Any, Callable, Dict, Optional
+
 import numpy as np
-from typing import Any, Dict, Callable, Optional, Tuple
+
 from .base import BaseSimplification
 from .registry import SimplificationRegistry
-from ..config.validation import ParameterValidator, validate_array_input
-from ..exceptions import ValidationError
 
 
 @SimplificationRegistry.register("superpixel")
@@ -25,7 +25,7 @@ class SuperpixelSimplification(BaseSimplification):
         Args:
             params: Parameters for superpixel segmentation
                 - segmentation_fn: Custom segmentation function (default: None)
-                - image_shape: Shape of images as (height, width) (required if segmentation_fn is None)
+                - image_shape: Shape of images as (height, width)
                 - method: Segmentation method 'slic' or 'grid' (default: 'slic')
                 - n_segments: Number of segments for SLIC (default: 200)
                 - compactness: SLIC compactness parameter (default: 8)
@@ -100,8 +100,8 @@ class SuperpixelSimplification(BaseSimplification):
     def _slic_segmentation(self, image: np.ndarray) -> np.ndarray:
         """Apply SLIC segmentation."""
         try:
-            from skimage.segmentation import slic
             from skimage.color import gray2rgb
+            from skimage.segmentation import slic
         except ImportError:
             raise ImportError("scikit-image is required for SLIC segmentation")
 

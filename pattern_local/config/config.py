@@ -2,15 +2,16 @@
 Configuration classes for PatternLocal.
 """
 
-from dataclasses import dataclass, field
-from typing import Dict, Any, Optional, Union, Literal
-import yaml
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, Dict, Literal, Optional, Union
 
+import yaml
+
+from ..exceptions import ConfigurationError
 from ..simplification.base import BaseSimplification
 from ..solvers.base import BaseSolver
-from ..exceptions import ConfigurationError
 
 LimeMode = Literal["tabular", "image"]
 
@@ -84,7 +85,8 @@ class SimplificationConfig:
         valid_methods = SimplificationRegistry.list_available()
         if self.method not in valid_methods:
             raise ConfigurationError(
-                f"Invalid simplification method: {self.method}. Valid: {valid_methods}"
+                f"Invalid simplification method: {
+                    self.method}. Valid: {valid_methods}"
             )
 
 

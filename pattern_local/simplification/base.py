@@ -2,9 +2,10 @@
 Base class for simplification methods.
 """
 
-import numpy as np
 from abc import ABC, abstractmethod
-from typing import Tuple, Any, Dict, Callable, Optional
+from typing import Any, Callable, Dict, Optional
+
+import numpy as np
 
 
 class BaseSimplification(ABC):
@@ -35,7 +36,6 @@ class BaseSimplification(ABC):
         Returns:
             Self for method chaining
         """
-        pass
 
     @abstractmethod
     def transform_instance(self, instance: np.ndarray) -> np.ndarray:
@@ -47,7 +47,6 @@ class BaseSimplification(ABC):
         Returns:
             Transformed instance
         """
-        pass
 
     @abstractmethod
     def transform_training_data(self, X_train: np.ndarray) -> np.ndarray:
@@ -59,7 +58,6 @@ class BaseSimplification(ABC):
         Returns:
             Transformed training data
         """
-        pass
 
     @abstractmethod
     def inverse_transform_weights(self, weights: np.ndarray) -> np.ndarray:
@@ -71,7 +69,6 @@ class BaseSimplification(ABC):
         Returns:
             Weights in original space
         """
-        pass
 
     @abstractmethod
     def create_predict_function(self, original_predict_fn: Callable) -> Callable:
@@ -83,7 +80,6 @@ class BaseSimplification(ABC):
         Returns:
             Prediction function for simplified space
         """
-        pass
 
     def fit_transform_instance(
         self, instance: np.ndarray, X_train: np.ndarray, **kwargs

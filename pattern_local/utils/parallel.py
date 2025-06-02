@@ -2,12 +2,13 @@
 Parallel processing utilities for batch operations.
 """
 
-import numpy as np
-from typing import List, Callable, Any, Optional, Union
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
-from functools import partial
-import multiprocessing as mp
 import logging
+import multiprocessing as mp
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from functools import partial
+from typing import Any, Callable, List, Optional
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -296,8 +297,9 @@ def parallel_cross_validation(
     Returns:
         List of cross-validation results
     """
-    from ..core.explainer import PatternLocalExplainer
     from sklearn.model_selection import KFold
+
+    from ..core.explainer import PatternLocalExplainer
 
     processor = ParallelProcessor(n_jobs=n_jobs, backend=backend)
     kf = KFold(n_splits=cv_folds, shuffle=True, random_state=42)

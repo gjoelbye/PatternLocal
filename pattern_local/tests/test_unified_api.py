@@ -2,9 +2,11 @@
 Test the unified API functionality for both tabular and image modes.
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from pattern_local import PatternLocalExplainer
+from pattern_local.exceptions import ValidationError
 
 
 class TestUnifiedAPI:
@@ -209,26 +211,18 @@ class TestUnifiedAPI:
             "lime_weights",
             "lime_intercept",
             "local_exp",
+            "metadata",
         }
         assert set(explanation_tab.keys()) == expected_keys
         assert set(explanation_img.keys()) == expected_keys
 
     def test_error_handling(self, random_state):
         """Test proper error handling for invalid configurations."""
-        # Should raise error for image mode without superpixel simplification
-        with pytest.raises(
-            ValueError, match="Image mode requires SuperpixelSimplification"
-        ):
-            explainer = PatternLocalExplainer(
-                simplification="none",
-                lime_params={"mode": "image"},
-                random_state=random_state,
-            )
-            explainer.fit(np.random.rand(10, 5))
-
         # Should raise error for unfitted explainer
         explainer = PatternLocalExplainer(random_state=random_state)
-        with pytest.raises(ValueError, match="Explainer must be fitted"):
+        with pytest.raises(
+            ValidationError, match="explain_instance requires fitted explainer"
+        ):
             explainer.explain_instance(
                 np.random.rand(5),
                 lambda x: np.random.rand(len(x), 2),

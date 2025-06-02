@@ -75,6 +75,11 @@ line-length = 88
 target-version = ['py38']
 include = '\.pyi?$'
 
+# Flake8 formatting
+[tool.flake8]
+max-line-length = 100 
+extend-ignore = ["E203"]
+
 # isort import sorting
 [tool.isort]
 profile = "black"

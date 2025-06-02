@@ -2,9 +2,8 @@
 Registry for patternlocal solver methods.
 """
 
-from .base import BaseSolver
 from ..utils.registry import BaseRegistry
-
+from .base import BaseSolver
 
 # Create singleton registry instance
 _registry = BaseRegistry(BaseSolver, "solver")

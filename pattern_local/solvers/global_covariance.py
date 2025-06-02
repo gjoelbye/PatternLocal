@@ -2,12 +2,13 @@
 Global covariance solver - baseline pattern method.
 """
 
-import numpy as np
 from typing import Any, Dict, Optional
 
+import numpy as np
+
+from ..exceptions import ComputationalError
 from .base import BaseSolver
 from .registry import SolverRegistry
-from ..exceptions import ComputationalError
 
 
 @SolverRegistry.register("global_covariance")

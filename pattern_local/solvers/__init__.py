@@ -6,11 +6,11 @@ from LIME weights and local data.
 """
 
 from .base import BaseSolver
-from .registry import SolverRegistry
-from .no_solver import NoSolver
 from .global_covariance import GlobalCovarianceSolver
-from .local_covariance import LocalCovarianceSolver
 from .lasso import LassoSolver
+from .local_covariance import LocalCovarianceSolver
+from .no_solver import NoSolver
+from .registry import SolverRegistry
 from .ridge import RidgeSolver
 
 __all__ = [

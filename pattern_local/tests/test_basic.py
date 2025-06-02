@@ -2,14 +2,15 @@
 Basic tests for PatternLocal package.
 """
 
-import pytest
 import numpy as np
+import pytest
 from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
 
 from pattern_local import PatternLocalExplainer
-from pattern_local.simplification import NoSimplification, LowRankSimplification
-from pattern_local.solvers import NoSolver, LocalCovarianceSolver, LassoSolver
+from pattern_local.exceptions import ConfigurationError, ValidationError
+from pattern_local.simplification import LowRankSimplification, NoSimplification
+from pattern_local.solvers import LassoSolver, LocalCovarianceSolver, NoSolver
 
 
 class TestPatternLocalExplainer:
@@ -127,7 +128,7 @@ class TestPatternLocalExplainer:
 
         # Weights should be in original space
         assert explanation["pattern_weights"].shape == (X.shape[1],)
-        assert explainer.simplification.n_components_fitted == 5
+        assert explainer.simplification.n_components_ == 5
 
     def test_custom_parameters(self, sample_data, trained_model):
         """Test custom parameter passing."""
@@ -157,10 +158,10 @@ class TestPatternLocalExplainer:
 
     def test_invalid_parameters(self):
         """Test error handling for invalid parameters."""
-        with pytest.raises(ValueError):
+        with pytest.raises(ConfigurationError):
             PatternLocalExplainer(simplification="invalid_method")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ConfigurationError):
             PatternLocalExplainer(solver="invalid_solver")
 
     def test_explain_before_fit(self, sample_data, trained_model):
@@ -173,7 +174,9 @@ class TestPatternLocalExplainer:
 
         explainer = PatternLocalExplainer()
 
-        with pytest.raises(ValueError, match="must be fitted"):
+        with pytest.raises(
+            ValidationError, match="explain_instance requires fitted explainer"
+        ):
             explainer.explain_instance(instance=X[0], predict_fn=predict_fn, X_train=X)
 
 
@@ -204,7 +207,7 @@ class TestComponents:
 
         simplification.fit(X)
         assert simplification.is_fitted
-        assert simplification.n_components_fitted == 3
+        assert simplification.n_components_ == 3
 
         # Test transforms
         instance = X[0]

@@ -2,16 +2,17 @@
 Strategy pattern implementations for LIME mode detection and explanation generation.
 """
 
-import numpy as np
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Callable, Optional, Union
 import logging
+from abc import ABC, abstractmethod
+from typing import Any, Callable, Dict, Optional
 
-from lime import lime_tabular, lime_image
+import numpy as np
+from lime import lime_image, lime_tabular
+
+from ..config.validation import ParameterValidator
+from ..exceptions import ExplanationError, ValidationError
 from ..simplification.base import BaseSimplification
 from ..simplification.superpixel import SuperpixelSimplification
-from ..config.validation import ParameterValidator
-from ..exceptions import ValidationError, ExplanationError
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,6 @@ class LimeModeStrategy(ABC):
         Returns:
             LIME mode ('tabular' or 'image')
         """
-        pass
 
     @abstractmethod
     def create_explainer(
@@ -51,7 +51,6 @@ class LimeModeStrategy(ABC):
         Returns:
             LIME explainer instance
         """
-        pass
 
     @abstractmethod
     def generate_explanation(
@@ -76,7 +75,6 @@ class LimeModeStrategy(ABC):
         Returns:
             LIME explanation object
         """
-        pass
 
     @abstractmethod
     def extract_explanation(self, explanation: Any, num_features: int) -> tuple:
@@ -89,7 +87,6 @@ class LimeModeStrategy(ABC):
         Returns:
             Tuple of (weights, intercept)
         """
-        pass
 
 
 class TabularModeStrategy(LimeModeStrategy):
@@ -245,13 +242,15 @@ class ImageModeStrategy(LimeModeStrategy):
         # Create segmentation function that returns 2D segments
         def segmentation_fn(img):
             # LIME expects segmentation function to return 2D array
-            # Our SuperpixelSimplification.segments is already flattened, so reshape it
+            # Our SuperpixelSimplification.segments is already flattened, so
+            # reshape it
             return simplification.segments.reshape(image_shape)
 
         # Create prediction function for LIME image format
         def predict_fn_image(images):
             """Prediction function that handles LIME's image format."""
-            # LIME passes images with shape (batch_size, height, width, channels)
+            # LIME passes images with shape (batch_size, height, width,
+            # channels)
             batch_size = images.shape[0]
             # Flatten to get back to our expected format
             images_flat = images.reshape(batch_size, -1)
@@ -266,7 +265,8 @@ class ImageModeStrategy(LimeModeStrategy):
             # Ensure predictions are in the right format for LIME
             # LIME expects a 2D array with shape (batch_size, n_classes)
             if len(predictions.shape) == 1:
-                # If 1D, assume binary classification and create 2-column matrix
+                # If 1D, assume binary classification and create 2-column
+                # matrix
                 predictions_2d = np.column_stack([1 - predictions, predictions])
                 return predictions_2d
             else:
@@ -294,7 +294,8 @@ class ImageModeStrategy(LimeModeStrategy):
 
     def extract_explanation(self, explanation: Any, num_features: int) -> tuple:
         """Extract weights and intercept from image explanation."""
-        # Image explanations structure: explanation.local_exp[label] contains (segment_id, weight) pairs
+        # Image explanations structure: explanation.local_exp[label] contains
+        # (segment_id, weight) pairs
         label_key = list(explanation.local_exp.keys())[0]
         local_exp = explanation.local_exp[label_key]
 

@@ -2,12 +2,13 @@
 Local covariance solver - main patternlocal method.
 """
 
-import numpy as np
 from typing import Any, Dict, Optional
 
+import numpy as np
+
+from ..exceptions import ComputationalError
 from .local_base import LocalSolverBase
 from .registry import SolverRegistry
-from ..exceptions import ComputationalError
 
 
 @SolverRegistry.register("local_covariance")

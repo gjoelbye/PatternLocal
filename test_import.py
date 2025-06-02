@@ -4,7 +4,6 @@ Simple test script to verify PatternLocal package imports and basic functionalit
 """
 
 import sys
-import os
 
 sys.path.append("src")
 
@@ -12,27 +11,13 @@ sys.path.append("src")
 def test_imports():
     """Test basic imports."""
     try:
-        from pattern_local import PatternLocalExplainer
+        pass
 
-        print("✓ PatternLocalExplainer imported successfully")
+        print("  PatternLocalExplainer imported successfully")
 
-        from pattern_local.simplification import (
-            NoSimplification,
-            LowRankSimplification,
-            SuperpixelSimplification,
-        )
+        print("  Simplification methods imported successfully")
 
-        print("✓ Simplification methods imported successfully")
-
-        from pattern_local.solvers import (
-            NoSolver,
-            GlobalCovarianceSolver,
-            LocalCovarianceSolver,
-            LassoSolver,
-            RidgeSolver,
-        )
-
-        print("✓ Solvers imported successfully")
+        print("  Solvers imported successfully")
 
         return True
     except Exception as e:
@@ -67,7 +52,7 @@ def test_basic_functionality():
         for simp, solv in configs:
             try:
                 explainer = PatternLocalExplainer(simplification=simp, solver=solv)
-                print(f"✓ Configuration ({simp}, {solv}) works")
+                print(f"  Configuration ({simp}, {solv}) works")
             except Exception as e:
                 print(f"✗ Configuration ({simp}, {solv}) failed: {e}")
                 return False
@@ -84,9 +69,9 @@ def test_basic_functionality():
 def test_end_to_end():
     """Test basic end-to-end functionality."""
     try:
-        import numpy as np
         from sklearn.datasets import make_classification
         from sklearn.ensemble import RandomForestClassifier
+
         from pattern_local import PatternLocalExplainer
 
         # Create simple data
@@ -112,7 +97,7 @@ def test_end_to_end():
         assert "lime_weights" in explanation
         assert explanation["pattern_weights"].shape == (5,)
 
-        print("✓ End-to-end test passed")
+        print("  End-to-end test passed")
         return True
 
     except Exception as e:

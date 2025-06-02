@@ -6,9 +6,9 @@ that can be applied before pattern computation.
 """
 
 from .base import BaseSimplification
-from .registry import SimplificationRegistry
-from .no_simplification import NoSimplification
 from .lowrank import LowRankSimplification
+from .no_simplification import NoSimplification
+from .registry import SimplificationRegistry
 from .superpixel import SuperpixelSimplification
 
 __all__ = [

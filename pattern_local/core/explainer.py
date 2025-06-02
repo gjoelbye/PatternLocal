@@ -2,27 +2,27 @@
 Main PatternLocal explainer class with enhanced architecture.
 """
 
-import numpy as np
-from typing import Any, Dict, Optional, Callable, Union, List
 import logging
+from typing import Any, Callable, Dict, Optional, Union
 
-from ..config.config import ExplainerConfig, LimeConfig
+import numpy as np
+
+from ..config.config import ExplainerConfig
 from ..config.validation import (
     ParameterValidator,
-    validate_fitted,
     validate_array_input,
+    validate_fitted,
+)
+from ..core.strategies import StrategyFactory
+from ..exceptions import (
+    ConfigurationError,
+    ExplanationError,
+    FittingError,
 )
 from ..simplification.base import BaseSimplification
 from ..simplification.registry import SimplificationRegistry
 from ..solvers.base import BaseSolver
 from ..solvers.registry import SolverRegistry
-from ..core.strategies import StrategyFactory, LimeModeStrategy
-from ..exceptions import (
-    ValidationError,
-    ExplanationError,
-    FittingError,
-    ConfigurationError,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -136,9 +136,14 @@ class PatternLocalExplainer:
         )
 
         self.logger.info(
-            f"Initialized with simplification: {type(self.simplification).__name__}, "
-            f"solver: {type(self.solver).__name__}, "
-            f"mode: {self.mode}"
+            f"Initialized with simplification: {
+                type(
+                    self.simplification).__name__}, "
+            f"solver: {
+                type(
+                    self.solver).__name__}, "
+            f"mode: {
+                        self.mode}"
         )
 
     def _create_simplification_legacy(
@@ -146,8 +151,8 @@ class PatternLocalExplainer:
     ):
         """Legacy simplification creation for backward compatibility."""
         from ..simplification import (
-            NoSimplification,
             LowRankSimplification,
+            NoSimplification,
             SuperpixelSimplification,
         )
 
@@ -165,10 +170,10 @@ class PatternLocalExplainer:
     def _create_solver_legacy(self, solver: str, params: Optional[Dict[str, Any]]):
         """Legacy solver creation for backward compatibility."""
         from ..solvers import (
-            NoSolver,
             GlobalCovarianceSolver,
-            LocalCovarianceSolver,
             LassoSolver,
+            LocalCovarianceSolver,
+            NoSolver,
             RidgeSolver,
         )
 
@@ -280,7 +285,10 @@ class PatternLocalExplainer:
             ValidationError: If inputs are invalid
         """
         try:
-            self.logger.info(f"Fitting explainer on {X_train.shape[0]} samples")
+            self.logger.info(
+                f"Fitting explainer on {
+                    X_train.shape[0]} samples"
+            )
 
             # Validate training data
             ParameterValidator.validate_training_data(X_train)
@@ -442,8 +450,11 @@ class PatternLocalExplainer:
         """String representation."""
         status = "fitted" if self.is_fitted else "not fitted"
         return (
-            f"PatternLocalExplainer(simplification={self.simplification_method}, "
-            f"solver={self.solver_method}, mode={self.mode}, {status})"
+            f"PatternLocalExplainer(simplification={
+                self.simplification_method}, "
+            f"solver={
+                self.solver_method}, mode={
+                self.mode}, {status})"
         )
 
     def __str__(self) -> str:

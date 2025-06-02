@@ -9,16 +9,16 @@ This example demonstrates the key improvements including:
 - Backward compatibility
 """
 
+from pattern_local import PatternLocalExplainer, SimplificationRegistry, SolverRegistry
+import logging
+
 import numpy as np
-from sklearn.datasets import make_classification, load_breast_cancer
+from sklearn.datasets import load_breast_cancer, make_classification
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-import logging
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
-
-from pattern_local import PatternLocalExplainer, SimplificationRegistry, SolverRegistry
 
 
 def basic_usage_example():
@@ -97,7 +97,7 @@ def fluent_interface_example():
     print(f"Explainer info: {explainer.get_explainer_info()}")
 
     # Explain instance
-    explanation = explainer.explain_instance(X_test[0], predict_fn, X_train)
+    explainer.explain_instance(X_test[0], predict_fn, X_train)
     print(f"Explanation completed using {explainer.mode} mode")
 
 
@@ -127,14 +127,15 @@ def registry_usage_example():
     # List available methods
     try:
         print(
-            f"Available simplification methods: {SimplificationRegistry.list_available()}"
+            f"Available simplification methods: {
+                SimplificationRegistry.list_available()}"
         )
-    except:
+    except BaseException:
         print("Registry not fully initialized (some methods not registered yet)")
 
     try:
         print(f"Available solver methods: {SolverRegistry.list_available()}")
-    except:
+    except BaseException:
         print("Registry not fully initialized (some methods not registered yet)")
 
     # Try to create methods using registry (with fallback to legacy)
@@ -237,7 +238,7 @@ def backward_compatibility_example():
 
     explainer.fit(X_train)
     explanation = explainer.explain_instance(X_test[0], predict_fn, X_train)
-    print(f"Backward compatible explanation completed")
+    print("Backward compatible explanation completed")
     print(f"Original API still returns: {list(explanation.keys())}")
 
 
