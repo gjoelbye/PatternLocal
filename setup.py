@@ -40,6 +40,7 @@ setup(
         "scipy>=1.7.0",
         "lime>=0.2.0",
         "scikit-image>=0.18.0",
+        "pyyaml>=6.0",
     ],
     extras_require={
         "dev": [

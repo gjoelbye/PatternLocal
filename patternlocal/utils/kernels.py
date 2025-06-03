@@ -1,262 +1,432 @@
 """
-Kernel functions for weighting in pattern computation.
+Kernel functions for local weighting in PatternLocal explanations.
+
+This module provides a collection of kernel functions for computing local weights
+in PatternLocal explanations. The kernels are used to weight training instances
+based on their distance to the instance being explained.
+
+The module includes:
+1. A registry system for managing kernel functions
+2. Built-in kernel implementations (Gaussian, Epanechnikov, etc.)
+3. Support for custom kernel functions through registration
+
+Custom kernels can be registered using the @KernelRegistry.register decorator.
+Example:
+    @KernelRegistry.register("my_kernel")
+    class MyKernel(KernelFunction):
+        def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+            # Custom kernel implementation
+            return np.exp(-distances / bandwidth)
+
+Available built-in kernels:
+- gaussian: Gaussian (RBF) kernel
+- epanechnikov: Epanechnikov kernel
+- uniform/rectangular: Uniform (box) kernel
+- triangular: Triangular kernel
+- biweight/quartic: Biweight (quartic) kernel
+- tricube: Tricube kernel
+- cosine: Cosine kernel
+- logistic: Logistic kernel
 """
 
-from typing import Callable
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Optional
 
 import numpy as np
 
+from ..exceptions import ValidationError
+from ..utils.registry import BaseRegistry
 
-def gaussian_kernel(distances: np.ndarray, bandwidth: float) -> np.ndarray:
-    """Gaussian kernel function.
 
-    Args:
-        distances: Array of distances
-        bandwidth: Kernel bandwidth (standard deviation)
+class KernelFunction(ABC):
+    """Abstract base class for kernel functions in PatternLocal explanations.
 
-    Returns:
-        Kernel weights
+    All kernel functions must inherit from this class and implement the __call__
+    method. The kernel function computes weights for instances based on their
+    distance to the instance being explained.
+
+    Example:
+        @KernelRegistry.register("custom")
+        class CustomKernel(KernelFunction):
+            def __init__(self, params: Optional[Dict[str, Any]] = None):
+                super().__init__()
+                self.params = params or {}
+
+            def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+                if bandwidth <= 0:
+                    raise ValidationError("bandwidth must be positive")
+                return np.exp(-distances / bandwidth)
+
+    Attributes:
+        params: Optional dictionary of parameters for the kernel
+
+    Methods:
+        __call__(distances, bandwidth): Compute kernel weights for distances
     """
-    if bandwidth <= 0:
-        raise ValueError("Bandwidth must be positive")
 
-    return np.exp(-0.5 * (distances / bandwidth) ** 2)
+    def __init__(self, params: Optional[Dict[str, Any]] = None):
+        """Initialize kernel function.
+
+        Args:
+            params: Optional dictionary of parameters for the kernel
+        """
+        self.params = params or {}
+
+    @abstractmethod
+    def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+        """Compute kernel weights for distances.
+
+        Args:
+            distances: Array of distances
+            bandwidth: Kernel bandwidth parameter
+
+        Returns:
+            Array of kernel weights
+        """
 
 
-def epanechnikov_kernel(distances: np.ndarray, bandwidth: float) -> np.ndarray:
-    """Epanechnikov kernel function.
+class GaussianKernel(KernelFunction):
+    """Gaussian (RBF) kernel function."""
 
-    Args:
-        distances: Array of distances
-        bandwidth: Kernel bandwidth
+    def __init__(self, params: Optional[Dict[str, Any]] = None):
+        """Initialize Gaussian kernel.
 
-    Returns:
-        Kernel weights
+        Args:
+            params: Optional dictionary of parameters (not used for this kernel)
+        """
+        super().__init__(params)
+
+    def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+        """Compute Gaussian kernel weights.
+
+        Args:
+            distances: Array of distances
+            bandwidth: Kernel bandwidth parameter
+
+        Returns:
+            Array of kernel weights
+        """
+        if bandwidth <= 0:
+            raise ValidationError("bandwidth must be positive for Gaussian kernel")
+        return np.exp(-0.5 * (distances / bandwidth) ** 2)
+
+
+class EpanechnikovKernel(KernelFunction):
+    """Epanechnikov kernel function."""
+
+    def __init__(self, params: Optional[Dict[str, Any]] = None):
+        """Initialize Epanechnikov kernel.
+
+        Args:
+            params: Optional dictionary of parameters (not used for this kernel)
+        """
+        super().__init__(params)
+
+    def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+        """Compute Epanechnikov kernel weights.
+
+        Args:
+            distances: Array of distances
+            bandwidth: Kernel bandwidth parameter
+
+        Returns:
+            Array of kernel weights
+        """
+        if bandwidth <= 0:
+            raise ValidationError("bandwidth must be positive for Epanechnikov kernel")
+        z = distances / bandwidth
+        weights = np.zeros_like(distances)
+        mask = z <= 1
+        weights[mask] = 0.75 * (1 - z[mask] ** 2)
+        return weights
+
+
+class UniformKernel(KernelFunction):
+    """Uniform (box) kernel function."""
+
+    def __init__(self, params: Optional[Dict[str, Any]] = None):
+        """Initialize Uniform kernel.
+
+        Args:
+            params: Optional dictionary of parameters (not used for this kernel)
+        """
+        super().__init__(params)
+
+    def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+        """Compute uniform kernel weights.
+
+        Args:
+            distances: Array of distances
+            bandwidth: Kernel bandwidth parameter
+
+        Returns:
+            Array of kernel weights
+        """
+        if bandwidth <= 0:
+            raise ValidationError("bandwidth must be positive for uniform kernel")
+        return (distances <= bandwidth).astype(float)
+
+
+class TriangularKernel(KernelFunction):
+    """Triangular kernel function."""
+
+    def __init__(self, params: Optional[Dict[str, Any]] = None):
+        """Initialize Triangular kernel.
+
+        Args:
+            params: Optional dictionary of parameters (not used for this kernel)
+        """
+        super().__init__(params)
+
+    def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+        """Compute triangular kernel weights.
+
+        Args:
+            distances: Array of distances
+            bandwidth: Kernel bandwidth parameter
+
+        Returns:
+            Array of kernel weights
+        """
+        if bandwidth <= 0:
+            raise ValidationError("bandwidth must be positive for triangular kernel")
+        z = distances / bandwidth
+        weights = np.zeros_like(distances)
+        mask = z <= 1
+        weights[mask] = 1 - z[mask]
+        return weights
+
+
+class BiweightKernel(KernelFunction):
+    """Biweight (quartic) kernel function."""
+
+    def __init__(self, params: Optional[Dict[str, Any]] = None):
+        """Initialize Biweight kernel.
+
+        Args:
+            params: Optional dictionary of parameters (not used for this kernel)
+        """
+        super().__init__(params)
+
+    def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+        """Compute biweight kernel weights.
+
+        Args:
+            distances: Array of distances
+            bandwidth: Kernel bandwidth parameter
+
+        Returns:
+            Array of kernel weights
+        """
+        if bandwidth <= 0:
+            raise ValidationError("bandwidth must be positive for biweight kernel")
+        z = distances / bandwidth
+        weights = np.zeros_like(distances)
+        mask = z <= 1
+        weights[mask] = (15 / 16) * (1 - z[mask] ** 2) ** 2
+        return weights
+
+
+class TricubeKernel(KernelFunction):
+    """Tricube kernel function."""
+
+    def __init__(self, params: Optional[Dict[str, Any]] = None):
+        """Initialize Tricube kernel.
+
+        Args:
+            params: Optional dictionary of parameters (not used for this kernel)
+        """
+        super().__init__(params)
+
+    def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+        """Compute tricube kernel weights.
+
+        Args:
+            distances: Array of distances
+            bandwidth: Kernel bandwidth parameter
+
+        Returns:
+            Array of kernel weights
+        """
+        if bandwidth <= 0:
+            raise ValidationError("bandwidth must be positive for tricube kernel")
+        z = distances / bandwidth
+        weights = np.zeros_like(distances)
+        mask = z <= 1
+        weights[mask] = (70 / 81) * (1 - z[mask] ** 3) ** 3
+        return weights
+
+
+class CosineKernel(KernelFunction):
+    """Cosine kernel function."""
+
+    def __init__(self, params: Optional[Dict[str, Any]] = None):
+        """Initialize Cosine kernel.
+
+        Args:
+            params: Optional dictionary of parameters (not used for this kernel)
+        """
+        super().__init__(params)
+
+    def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+        """Compute cosine kernel weights.
+
+        Args:
+            distances: Array of distances
+            bandwidth: Kernel bandwidth parameter
+
+        Returns:
+            Array of kernel weights
+        """
+        if bandwidth <= 0:
+            raise ValidationError("bandwidth must be positive for cosine kernel")
+        z = distances / bandwidth
+        weights = np.zeros_like(distances)
+        mask = z <= 1
+        weights[mask] = (np.pi / 4) * np.cos(np.pi / 2 * z[mask])
+        return weights
+
+
+class LogisticKernel(KernelFunction):
+    """Logistic kernel function."""
+
+    def __call__(self, distances: np.ndarray, bandwidth: float) -> np.ndarray:
+        """Compute logistic kernel weights.
+
+        Args:
+            distances: Array of distances
+            bandwidth: Kernel bandwidth parameter
+
+        Returns:
+            Array of kernel weights
+        """
+        if bandwidth <= 0:
+            raise ValidationError("bandwidth must be positive for logistic kernel")
+        z = distances / bandwidth
+        return 1 / (np.exp(z) + 2 + np.exp(-z))
+
+
+# Create singleton registry instance
+_registry = BaseRegistry(KernelFunction, "kernel")
+
+
+class KernelRegistry:
+    """Registry for managing kernel functions in PatternLocal explanations.
+
+    This class provides a centralized registry for kernel functions, allowing
+    easy registration and instantiation of both built-in and custom kernels.
+
+    The registry supports:
+    1. Registration of custom kernels using the @register decorator
+    2. Creation of kernel instances using create()
+    3. Listing available kernels using list_available()
+    4. Checking kernel registration using is_registered()
+
+    Example:
+        # Register a custom kernel
+        @KernelRegistry.register("my_kernel")
+        class MyKernel(KernelFunction):
+            def __call__(self, distances, bandwidth):
+                return np.exp(-distances / bandwidth)
+
+        # Create and use a kernel
+        kernel = KernelRegistry.create("my_kernel")
+        weights = kernel(distances, bandwidth=1.0)
+
+    Class methods:
+        register(name): Decorator to register a kernel function
+        create(name, params): Create a kernel function instance
+        list_available(): List all available kernel functions
+        is_registered(name): Check if a kernel function is registered
     """
-    if bandwidth <= 0:
-        raise ValueError("Bandwidth must be positive")
 
-    normalized_distances = distances / bandwidth
-    weights = np.maximum(0, 1 - normalized_distances**2)
-    return 0.75 * weights
+    @classmethod
+    def register(cls, name: str):
+        """Decorator to register a kernel function."""
+        return _registry.register(name)
 
+    @classmethod
+    def create(cls, name: str, params: Optional[Dict[str, Any]] = None):
+        """Create a kernel function instance."""
+        return _registry.create(name, params)
 
-def uniform_kernel(distances: np.ndarray, bandwidth: float) -> np.ndarray:
-    """Uniform (rectangular) kernel function.
+    @classmethod
+    def list_available(cls):
+        """List all available kernel functions."""
+        return _registry.list_available()
 
-    Args:
-        distances: Array of distances
-        bandwidth: Kernel bandwidth
-
-    Returns:
-        Kernel weights
-    """
-    if bandwidth <= 0:
-        raise ValueError("Bandwidth must be positive")
-
-    return (distances <= bandwidth).astype(float)
+    @classmethod
+    def is_registered(cls, name: str):
+        """Check if a kernel function is registered."""
+        return _registry.is_registered(name)
 
 
-def triangular_kernel(distances: np.ndarray, bandwidth: float) -> np.ndarray:
-    """Triangular kernel function.
+# Register built-in kernels
+@KernelRegistry.register("gaussian")
+class RegisteredGaussianKernel(GaussianKernel):
+    """Registered Gaussian kernel function."""
 
-    Args:
-        distances: Array of distances
-        bandwidth: Kernel bandwidth
-
-    Returns:
-        Kernel weights
-    """
-    if bandwidth <= 0:
-        raise ValueError("Bandwidth must be positive")
-
-    normalized_distances = distances / bandwidth
-    return np.maximum(0, 1 - normalized_distances)
+    pass
 
 
-def biweight_kernel(distances: np.ndarray, bandwidth: float) -> np.ndarray:
-    """Biweight (quartic) kernel function.
+@KernelRegistry.register("epanechnikov")
+class RegisteredEpanechnikovKernel(EpanechnikovKernel):
+    """Registered Epanechnikov kernel function."""
 
-    Args:
-        distances: Array of distances
-        bandwidth: Kernel bandwidth
-
-    Returns:
-        Kernel weights
-    """
-    if bandwidth <= 0:
-        raise ValueError("Bandwidth must be positive")
-
-    normalized_distances = distances / bandwidth
-    inside_support = normalized_distances <= 1
-    weights = np.zeros_like(distances)
-    weights[inside_support] = (15 / 16) * (
-        1 - normalized_distances[inside_support] ** 2
-    ) ** 2
-    return weights
+    pass
 
 
-def tricube_kernel(distances: np.ndarray, bandwidth: float) -> np.ndarray:
-    """Tricube kernel function.
+@KernelRegistry.register("uniform")
+class RegisteredUniformKernel(UniformKernel):
+    """Registered uniform kernel function."""
 
-    Args:
-        distances: Array of distances
-        bandwidth: Kernel bandwidth
-
-    Returns:
-        Kernel weights
-    """
-    if bandwidth <= 0:
-        raise ValueError("Bandwidth must be positive")
-
-    normalized_distances = distances / bandwidth
-    inside_support = normalized_distances <= 1
-    weights = np.zeros_like(distances)
-    weights[inside_support] = (70 / 81) * (
-        1 - normalized_distances[inside_support] ** 3
-    ) ** 3
-    return weights
+    pass
 
 
-def cosine_kernel(distances: np.ndarray, bandwidth: float) -> np.ndarray:
-    """Cosine kernel function.
+@KernelRegistry.register("rectangular")
+class RegisteredRectangularKernel(UniformKernel):
+    """Registered rectangular kernel function (alias for uniform)."""
 
-    Args:
-        distances: Array of distances
-        bandwidth: Kernel bandwidth
-
-    Returns:
-        Kernel weights
-    """
-    if bandwidth <= 0:
-        raise ValueError("Bandwidth must be positive")
-
-    normalized_distances = distances / bandwidth
-    inside_support = normalized_distances <= 1
-    weights = np.zeros_like(distances)
-    weights[inside_support] = (np.pi / 4) * np.cos(
-        np.pi / 2 * normalized_distances[inside_support]
-    )
-    return weights
+    pass
 
 
-def logistic_kernel(distances: np.ndarray, bandwidth: float) -> np.ndarray:
-    """Logistic kernel function.
+@KernelRegistry.register("triangular")
+class RegisteredTriangularKernel(TriangularKernel):
+    """Registered triangular kernel function."""
 
-    Args:
-        distances: Array of distances
-        bandwidth: Kernel bandwidth
-
-    Returns:
-        Kernel weights
-    """
-    if bandwidth <= 0:
-        raise ValueError("Bandwidth must be positive")
-
-    normalized_distances = distances / bandwidth
-    return 1 / (np.exp(normalized_distances) + 2 + np.exp(-normalized_distances))
+    pass
 
 
-# Registry of available kernels
-KERNEL_REGISTRY = {
-    "gaussian": gaussian_kernel,
-    "epanechnikov": epanechnikov_kernel,
-    "uniform": uniform_kernel,
-    "rectangular": uniform_kernel,  # Alias
-    "triangular": triangular_kernel,
-    "biweight": biweight_kernel,
-    "quartic": biweight_kernel,  # Alias
-    "tricube": tricube_kernel,
-    "cosine": cosine_kernel,
-    "logistic": logistic_kernel,
-}
+@KernelRegistry.register("biweight")
+class RegisteredBiweightKernel(BiweightKernel):
+    """Registered biweight kernel function."""
+
+    pass
 
 
-def get_kernel_function(kernel_name: str) -> Callable[[np.ndarray, float], np.ndarray]:
-    """Get kernel function by name.
+@KernelRegistry.register("quartic")
+class RegisteredQuarticKernel(BiweightKernel):
+    """Registered quartic kernel function (alias for biweight)."""
 
-    Args:
-        kernel_name: Name of the kernel function
-
-    Returns:
-        Kernel function
-
-    Raises:
-        ValueError: If kernel name is not recognized
-    """
-    if kernel_name not in KERNEL_REGISTRY:
-        available = list(KERNEL_REGISTRY.keys())
-        raise ValueError(f"Unknown kernel: {kernel_name}. Available: {available}")
-
-    return KERNEL_REGISTRY[kernel_name]
+    pass
 
 
-# def adaptive_bandwidth(distances: np.ndarray,
-#                       method: str = 'median',
-#                       factor: float = 1.0) -> float:
-#     """Estimate adaptive bandwidth from distances.
+@KernelRegistry.register("tricube")
+class RegisteredTricubeKernel(TricubeKernel):
+    """Registered tricube kernel function."""
 
-#     Args:
-#         distances: Array of distances
-#         method: Method for bandwidth estimation ('median', 'mean', 'std', 'silverman')
-#         factor: Scaling factor for the bandwidth
-
-#     Returns:
-#         Estimated bandwidth
-#     """
-#     if len(distances) == 0:
-#         return 1.0
-
-#     if method == 'median':
-#         bandwidth = np.median(distances)
-#     elif method == 'mean':
-#         bandwidth = np.mean(distances)
-#     elif method == 'std':
-#         bandwidth = np.std(distances)
-#     elif method == 'silverman':
-#         # Silverman's rule of thumb for Gaussian kernels
-#         n = len(distances)
-#         bandwidth = 1.06 * np.std(distances) * (n ** (-1/5))
-#     else:
-#         raise ValueError(f"Unknown bandwidth method: {method}")
-
-#     # Ensure positive bandwidth
-#     bandwidth = max(bandwidth, np.finfo(float).eps)
-
-#     return factor * bandwidth
+    pass
 
 
-# def kernel_density_estimate(query_points: np.ndarray,
-#                            data_points: np.ndarray,
-#                            kernel_name: str = 'gaussian',
-#                            bandwidth: Union[float, str] = 'adaptive') -> np.ndarray:
-#     """Estimate kernel density at query points.
+@KernelRegistry.register("cosine")
+class RegisteredCosineKernel(CosineKernel):
+    """Registered cosine kernel function."""
 
-#     Args:
-#         query_points: Points where to estimate density, shape (n_query, n_features)
-#         data_points: Training data points, shape (n_data, n_features)
-#         kernel_name: Name of kernel function to use
-#         bandwidth: Bandwidth value or 'adaptive' for automatic estimation
+    pass
 
-#     Returns:
-#         Density estimates at query points, shape (n_query,)
-#     """
-#     kernel_func = get_kernel_function(kernel_name)
-#     n_data = data_points.shape[0]
-#     densities = np.zeros(query_points.shape[0])
 
-#     for i, query_point in enumerate(query_points):
-#         # Calculate distances from query point to all data points
-#         distances = np.linalg.norm(data_points - query_point, axis=1)
+@KernelRegistry.register("logistic")
+class RegisteredLogisticKernel(LogisticKernel):
+    """Registered logistic kernel function."""
 
-#         # Estimate bandwidth if needed
-#         if isinstance(bandwidth, str) and bandwidth == 'adaptive':
-#             h = adaptive_bandwidth(distances, method='median')
-#         else:
-#             h = bandwidth
-
-#         # Calculate kernel weights and sum for density estimate
-#         weights = kernel_func(distances, h)
-#         densities[i] = np.sum(weights) / (n_data * h)
-
-#     return densities
+    pass

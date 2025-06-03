@@ -82,10 +82,7 @@ class ParameterValidator:
             raise ValidationError(f"{name} must be {ndim}-dimensional, got {arr.ndim}")
 
         if dtype is not None and arr.dtype != dtype:
-            raise ValidationError(
-                f"{name} must have dtype {dtype}, got {
-                    arr.dtype}"
-            )
+            raise ValidationError(f"{name} must have dtype {dtype}, got {arr.dtype}")
 
         if np.any(np.isnan(arr)):
             raise ValidationError(f"{name} contains NaN values")
@@ -138,91 +135,6 @@ class ParameterValidator:
 
         if np.any(np.isinf(test_output)):
             raise ValidationError("predict_fn returns infinite values")
-
-    @staticmethod
-    def validate_lime_params(mode: str, params: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate and normalize LIME parameters.
-
-        Args:
-            mode: LIME mode ('tabular' or 'image')
-            params: LIME parameters
-
-        Returns:
-            Validated and normalized parameters
-
-        Raises:
-            ValidationError: If validation fails
-        """
-        validated_params = params.copy()
-
-        # Validate common parameters
-        if "num_samples" in validated_params:
-            if (
-                not isinstance(validated_params["num_samples"], int)
-                or validated_params["num_samples"] <= 0
-            ):
-                raise ValidationError("num_samples must be a positive integer")
-
-        if (
-            "kernel_width" in validated_params
-            and validated_params["kernel_width"] is not None
-        ):
-            if (
-                not isinstance(validated_params["kernel_width"], (int, float))
-                or validated_params["kernel_width"] <= 0
-            ):
-                raise ValidationError("kernel_width must be a positive number")
-
-        # Mode-specific validation
-        if mode == "image":
-            if "labels" not in validated_params:
-                logger.warning("No labels specified for image mode, using [1]")
-                validated_params["labels"] = [1]
-            elif not isinstance(validated_params["labels"], list):
-                raise ValidationError("labels must be a list for image mode")
-
-        elif mode == "tabular":
-            if "discretize_continuous" in validated_params:
-                if not isinstance(validated_params["discretize_continuous"], bool):
-                    raise ValidationError("discretize_continuous must be boolean")
-
-        return validated_params
-
-    @staticmethod
-    def validate_solver_inputs(
-        lime_weights: np.ndarray,
-        lime_intercept: float,
-        instance: np.ndarray,
-        X_train: np.ndarray,
-    ) -> None:
-        """Validate solver input arguments.
-
-        Args:
-            lime_weights: LIME explanation weights
-            lime_intercept: LIME explanation intercept
-            instance: The instance being explained
-            X_train: Training data
-
-        Raises:
-            ValidationError: If validation fails
-        """
-        ParameterValidator.validate_array(lime_weights, "lime_weights", ndim=1)
-        ParameterValidator.validate_array(instance, "instance", ndim=1)
-        ParameterValidator.validate_array(X_train, "X_train", ndim=2)
-
-        if not np.isscalar(lime_intercept):
-            raise ValidationError("lime_intercept must be a scalar")
-
-        if np.isnan(lime_intercept) or np.isinf(lime_intercept):
-            raise ValidationError("lime_intercept must be finite")
-
-        if lime_weights.shape[0] != instance.shape[0]:
-            raise ValidationError("lime_weights and instance must have same length")
-
-        if X_train.shape[1] != instance.shape[0]:
-            raise ValidationError(
-                "X_train feature dimension must match instance length"
-            )
 
     @staticmethod
     def validate_image_params(

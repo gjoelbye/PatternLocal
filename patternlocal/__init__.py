@@ -80,14 +80,7 @@ from .solvers.base import BaseSolver
 from .solvers.registry import SolverRegistry
 
 # Utilities
-from .utils import (
-    ParallelProcessor,
-    calculate_distances,
-    epanechnikov_kernel,
-    gaussian_kernel,
-    project_point_onto_hyperplane,
-    uniform_kernel,
-)
+from .utils import ParallelProcessor, calculate_distances, project_point_onto_hyperplane
 
 # Parallel processing functions
 from .utils.parallel import (
@@ -130,9 +123,6 @@ __all__ = [
     "SolverRegistry",
     # Utilities
     "calculate_distances",
-    "gaussian_kernel",
-    "epanechnikov_kernel",
-    "uniform_kernel",
     "project_point_onto_hyperplane",
     "ParallelProcessor",
     # Parallel functions

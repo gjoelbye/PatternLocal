@@ -6,9 +6,9 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 
-from ..exceptions import ComputationalError
+from ..exceptions import ComputationalError, ValidationError
 from ..utils.distance import calculate_distances
-from ..utils.kernels import gaussian_kernel
+from ..utils.kernels import KernelRegistry
 from ..utils.projection import project_point_onto_hyperplane
 from .base import BaseSolver
 
@@ -23,23 +23,82 @@ class LocalSolverBase(BaseSolver):
     4. Extract local data with weights
     """
 
+    # Set of known parameters for local solvers
+    KNOWN_PARAMS = {
+        "k_ratio",
+        "bandwidth",
+        "kernel",
+        "distance_metric",
+        "use_projection",
+    }
+
     def __init__(self, params: Optional[Dict[str, Any]] = None):
         """Initialize LocalSolverBase.
 
         Common parameters:
             - k_ratio: Ratio of samples to use for local estimation (default: 0.1)
             - bandwidth: Kernel bandwidth (default: None, auto-estimate)
-            - kernel_function: Kernel function (default: gaussian_kernel)
+            - kernel: Kernel function name (default: 'gaussian')
             - distance_metric: Distance metric (default: 'euclidean')
-            - use_projection: Whether to project point onto hyperplane (default: True)
+            - use_projection: Whether to project point onto hyperplane (default: False)
         """
         super().__init__(params)
 
-        self.k_ratio = self.params.get("k_ratio", 0.1)
+        # Check for unknown parameters
+        unknown_params = set(self.params.keys()) - self.KNOWN_PARAMS
+        if unknown_params:
+            raise ValidationError(
+                f"Unknown parameters for {self.__class__.__name__}: {unknown_params}"
+            )
+
+        self.k_ratio = self.params.get("k_ratio", 1.0)
         self.bandwidth = self.params.get("bandwidth", None)
-        self.kernel_function = self.params.get("kernel_function", gaussian_kernel)
+        kernel_name = self.params.get("kernel", "gaussian")
+        if not KernelRegistry.is_registered(kernel_name):
+            raise ValidationError(
+                f"Unknown kernel '{kernel_name}'. \
+                    Available kernels: {KernelRegistry.list_available()}"
+            )
+        self.kernel_function = KernelRegistry.create(kernel_name)
         self.distance_metric = self.params.get("distance_metric", "euclidean")
-        self.use_projection = self.params.get("use_projection", True)
+        self.use_projection = self.params.get("use_projection", False)
+
+        # Validate parameters
+        self._validate_params()
+
+    def _validate_params(self) -> None:
+        """Validate local solver parameters.
+
+        Raises:
+            ValidationError: If parameters are invalid
+        """
+        # Validate k_ratio
+        if isinstance(self.k_ratio, float):
+            if not 0 < self.k_ratio <= 1:
+                raise ValidationError("k_ratio must be between 0 and 1 when float")
+        elif isinstance(self.k_ratio, int):
+            if self.k_ratio <= 0:
+                raise ValidationError("k_ratio must be positive when integer")
+        else:
+            raise ValidationError(
+                "k_ratio must be float between 0-1 or positive integer"
+            )
+
+        # Validate bandwidth
+        if self.bandwidth is not None:
+            if not isinstance(self.bandwidth, (int, float)):
+                raise ValidationError("bandwidth must be numeric")
+            if self.bandwidth <= 0:
+                raise ValidationError("bandwidth must be positive")
+
+        # Validate distance_metric
+        valid_metrics = ["euclidean", "manhattan", "cosine"]
+        if self.distance_metric not in valid_metrics:
+            raise ValidationError(f"distance_metric must be one of {valid_metrics}")
+
+        # Validate use_projection
+        if not isinstance(self.use_projection, bool):
+            raise ValidationError("use_projection must be boolean")
 
     def _get_analysis_point(
         self, lime_weights: np.ndarray, lime_intercept: float, instance: np.ndarray

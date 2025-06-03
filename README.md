@@ -176,7 +176,7 @@ lime_params = {
     'num_samples': 5000,            # Number of LIME samples
     'feature_selection': 'auto',    # Feature selection method
     'discretize_continuous': True,  # Discretize continuous features
-    'kernel_width': None           # Auto-estimate kernel width
+    'bandwidth': None           # Auto-estimate kernel width
 }
 ```
 
@@ -185,7 +185,7 @@ lime_params = {
 lime_params = {
     'mode': 'image',               # Required for image mode
     'num_samples': 1000,           # Number of LIME samples
-    'kernel_width': 0.25,          # Kernel bandwidth
+    'bandwidth': 0.25,          # Kernel bandwidth
     'feature_selection': 'none',   # Usually 'none' for images
     'verbose': False              # Verbose output
 }
@@ -360,7 +360,7 @@ explainer = PatternLocalExplainer(
     lime_params={
         'mode': 'image',
         'num_samples': 1000,
-        'kernel_width': 0.25
+        'bandwidth': 0.25
     },
     simplification_params={
         'image_shape': (28, 28),
@@ -435,8 +435,8 @@ Main class for patternlocal explanations supporting both tabular and image data.
   - `'superpixel'`: Superpixel segmentation (image data)
 - `solver`: str or BaseSolver instance  
 - `lime_params`: dict, optional - Parameters for LIME
-  - For tabular: `feature_selection`, `discretize_continuous`, `kernel_width`
-  - For image: `mode='image'`, `kernel_width`, `verbose`
+  - For tabular: `feature_selection`, `discretize_continuous`, `bandwidth`
+  - For image: `mode='image'`, `bandwidth`, `verbose`
 - `simplification_params`: dict, optional - Parameters for simplification
 - `solver_params`: dict, optional - Parameters for solver
 - `random_state`: int, optional - Random seed

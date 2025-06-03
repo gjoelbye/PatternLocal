@@ -21,20 +21,6 @@ class LimeModeStrategy(ABC):
     """Abstract strategy for LIME mode detection and explanation generation."""
 
     @abstractmethod
-    def detect_mode(
-        self, simplification: BaseSimplification, lime_params: Dict[str, Any]
-    ) -> str:
-        """Detect appropriate LIME mode.
-
-        Args:
-            simplification: Simplification method
-            lime_params: LIME parameters
-
-        Returns:
-            LIME mode ('tabular' or 'image')
-        """
-
-    @abstractmethod
     def create_explainer(
         self,
         X_train: np.ndarray,
@@ -89,24 +75,82 @@ class LimeModeStrategy(ABC):
         """
 
 
+# ToDo: Add feature selection
+
+
 class TabularModeStrategy(LimeModeStrategy):
     """Strategy for tabular data mode."""
 
-    def detect_mode(
-        self, simplification: BaseSimplification, lime_params: Dict[str, Any]
-    ) -> str:
-        """Detect tabular mode."""
-        # Check explicit mode specification
-        if "mode" in lime_params:
-            if lime_params["mode"] == "image":
-                logger.warning("Explicit image mode with non-superpixel simplification")
-            return lime_params["mode"]
+    # Set of known parameters for tabular mode
+    KNOWN_PARAMS = {
+        "num_samples",
+        "bandwidth",
+        "discretize_continuous",
+        # "feature_selection",  # TODO: Implement feature selection
+        "sample_around_instance",
+        "mode",  # Common parameter for mode selection
+    }
 
-        # Auto-detect: tabular if not superpixel simplification
-        if not isinstance(simplification, SuperpixelSimplification):
-            return "tabular"
+    @staticmethod
+    def validate_lime_params(params: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate and normalize tabular LIME parameters.
 
-        return "image"  # Superpixel implies image mode
+        Args:
+            params: LIME parameters
+
+        Returns:
+            Validated and normalized parameters
+
+        Raises:
+            ValidationError: If validation fails or unknown parameters are provided
+        """
+        validated_params = params.copy()
+
+        # Check for unknown parameters
+        unknown_params = set(validated_params.keys()) - TabularModeStrategy.KNOWN_PARAMS
+        if unknown_params:
+            raise ValidationError(
+                f"Unknown parameters for tabular mode: {unknown_params}. "
+                f"Known parameters are: {sorted(TabularModeStrategy.KNOWN_PARAMS)}"
+            )
+
+        # Validate common parameters
+        if "num_samples" in validated_params:
+            if (
+                not isinstance(validated_params["num_samples"], int)
+                or validated_params["num_samples"] <= 0
+            ):
+                raise ValidationError("num_samples must be a positive integer")
+
+        if (
+            "bandwidth" in validated_params
+            and validated_params["bandwidth"] is not None
+        ):
+            if (
+                not isinstance(validated_params["bandwidth"], (int, float))
+                or validated_params["bandwidth"] <= 0
+            ):
+                raise ValidationError("bandwidth must be a positive number")
+
+        # Tabular-specific validation
+        if "discretize_continuous" in validated_params:
+            if not isinstance(validated_params["discretize_continuous"], bool):
+                raise ValidationError("discretize_continuous must be boolean")
+
+        # TODO: Implement feature selection validation
+        # if "feature_selection" in validated_params:
+        #     valid_selections = ["none", "auto", "forward", "lasso_path", "highest_weights"]
+        #     if validated_params["feature_selection"] not in valid_selections:
+        #         raise ValidationError(f"feature_selection must be one of {valid_selections}")
+
+        if "sample_around_instance" in validated_params:
+            if not isinstance(validated_params["sample_around_instance"], bool):
+                raise ValidationError("sample_around_instance must be boolean")
+
+        # Force feature selection to none until implemented
+        validated_params["feature_selection"] = "none"
+
+        return validated_params
 
     def create_explainer(
         self,
@@ -115,15 +159,13 @@ class TabularModeStrategy(LimeModeStrategy):
         random_state: Optional[int] = None,
     ) -> lime_tabular.LimeTabularExplainer:
         """Create tabular LIME explainer."""
-        validated_params = ParameterValidator.validate_lime_params(
-            "tabular", lime_params
-        )
+        validated_params = self.validate_lime_params(lime_params)
 
         return lime_tabular.LimeTabularExplainer(
             X_train,
-            feature_selection=validated_params.get("feature_selection", "auto"),
+            feature_selection="none",  # Force feature selection to none until implemented
             discretize_continuous=validated_params.get("discretize_continuous", True),
-            kernel_width=validated_params.get("kernel_width", None),
+            kernel_width=validated_params.get("bandwidth", None),
             sample_around_instance=validated_params.get("sample_around_instance", True),
             random_state=random_state,
         )
@@ -172,23 +214,93 @@ class TabularModeStrategy(LimeModeStrategy):
 
         return weights, intercept
 
+    def detect_mode(
+        self, simplification: BaseSimplification, lime_params: Dict[str, Any]
+    ) -> str:
+        """Detect LIME mode for tabular data."""
+        return "tabular"
+
 
 class ImageModeStrategy(LimeModeStrategy):
     """Strategy for image data mode."""
 
-    def detect_mode(
-        self, simplification: BaseSimplification, lime_params: Dict[str, Any]
-    ) -> str:
-        """Detect image mode."""
-        # Check explicit mode specification
-        if "mode" in lime_params and lime_params["mode"] == "image":
-            return "image"
+    # Set of known parameters for image mode
+    KNOWN_PARAMS = {
+        "num_samples",
+        "bandwidth",
+        "labels",
+        # "feature_selection",  # TODO: Implement feature selection
+        "verbose",
+        "hide_color",
+        "mode",  # Common parameter for mode selection
+    }
 
-        # Auto-detect: image if superpixel simplification
-        if isinstance(simplification, SuperpixelSimplification):
-            return "image"
+    @staticmethod
+    def validate_lime_params(params: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate and normalize image LIME parameters.
 
-        return "tabular"
+        Args:
+            params: LIME parameters
+
+        Returns:
+            Validated and normalized parameters
+
+        Raises:
+            ValidationError: If validation fails or unknown parameters are provided
+        """
+        validated_params = params.copy()
+
+        # Check for unknown parameters
+        unknown_params = set(validated_params.keys()) - ImageModeStrategy.KNOWN_PARAMS
+        if unknown_params:
+            raise ValidationError(
+                f"Unknown parameters for image mode: {unknown_params}. "
+                f"Known parameters are: {sorted(ImageModeStrategy.KNOWN_PARAMS)}"
+            )
+
+        # Validate common parameters
+        if "num_samples" in validated_params:
+            if (
+                not isinstance(validated_params["num_samples"], int)
+                or validated_params["num_samples"] <= 0
+            ):
+                raise ValidationError("num_samples must be a positive integer")
+
+        if (
+            "bandwidth" in validated_params
+            and validated_params["bandwidth"] is not None
+        ):
+            if (
+                not isinstance(validated_params["bandwidth"], (int, float))
+                or validated_params["bandwidth"] <= 0
+            ):
+                raise ValidationError("bandwidth must be a positive number")
+
+        # Image-specific validation
+        if "labels" not in validated_params:
+            logger.warning("No labels specified for image mode, using [1]")
+            validated_params["labels"] = [1]
+        elif not isinstance(validated_params["labels"], list):
+            raise ValidationError("labels must be a list for image mode")
+
+        # TODO: Implement feature selection validation
+        # if "feature_selection" in validated_params:
+        #     valid_selections = ["none", "auto", "forward", "lasso_path", "highest_weights"]
+        #     if validated_params["feature_selection"] not in valid_selections:
+        #         raise ValidationError(f"feature_selection must be one of {valid_selections}")
+
+        if "verbose" in validated_params:
+            if not isinstance(validated_params["verbose"], bool):
+                raise ValidationError("verbose must be boolean")
+
+        if "hide_color" in validated_params:
+            if not isinstance(validated_params["hide_color"], (int, float)):
+                raise ValidationError("hide_color must be a number")
+
+        # Force feature selection to none until implemented
+        validated_params["feature_selection"] = "none"
+
+        return validated_params
 
     def create_explainer(
         self,
@@ -197,17 +309,17 @@ class ImageModeStrategy(LimeModeStrategy):
         random_state: Optional[int] = None,
     ) -> lime_image.LimeImageExplainer:
         """Create image LIME explainer."""
-        validated_params = ParameterValidator.validate_lime_params("image", lime_params)
+        validated_params = self.validate_lime_params(lime_params)
 
-        # Handle kernel_width - image explainer doesn't accept None
-        kernel_width = validated_params.get("kernel_width", 0.25)
-        if kernel_width is None:
-            kernel_width = 0.25
+        # Handle bandwidth - image explainer doesn't accept None
+        bandwidth = validated_params.get("bandwidth", 0.25)
+        if bandwidth is None:
+            bandwidth = 0.25
 
         return lime_image.LimeImageExplainer(
-            kernel_width=kernel_width,
+            kernel_width=bandwidth,
             verbose=validated_params.get("verbose", False),
-            feature_selection=validated_params.get("feature_selection", "none"),
+            feature_selection="none",  # Force feature selection to none until implemented
             random_state=random_state,
         )
 
@@ -316,6 +428,12 @@ class ImageModeStrategy(LimeModeStrategy):
 
         return weights, intercept
 
+    def detect_mode(
+        self, simplification: BaseSimplification, lime_params: Dict[str, Any]
+    ) -> str:
+        """Detect LIME mode for image data."""
+        return "image"
+
 
 class StrategyFactory:
     """Factory for creating strategy instances."""
@@ -359,8 +477,13 @@ class StrategyFactory:
         Returns:
             Strategy instance
         """
-        # Try image strategy first for auto-detection
-        image_strategy = cls.create_strategy("image")
-        detected_mode = image_strategy.detect_mode(simplification, lime_params)
 
-        return cls.create_strategy(detected_mode)
+        if "mode" in lime_params:
+            if lime_params["mode"] in StrategyFactory._strategies:
+                return cls.create_strategy(lime_params["mode"])
+
+        elif isinstance(simplification, SuperpixelSimplification):
+            return cls.create_strategy("image")
+
+        else:
+            return cls.create_strategy("tabular")

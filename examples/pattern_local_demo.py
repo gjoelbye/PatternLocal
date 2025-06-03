@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 from patternlocal import PatternLocalExplainer
+from patternlocal.utils.kernels import KernelRegistry
 
 
 def create_synthetic_data():
@@ -219,11 +220,6 @@ def demo_custom_parameters():
     def predict_fn(X):
         return model.predict_proba(X)
 
-    # Custom kernel function
-    def custom_kernel(distances, bandwidth):
-        """Custom exponential kernel."""
-        return np.exp(-distances / bandwidth)
-
     # Advanced configuration
     lime_params = {
         "num_samples": 10000,  # More samples for better stability
@@ -233,7 +229,7 @@ def demo_custom_parameters():
 
     solver_params = {
         "k_ratio": 0.15,  # Use 15% of training data
-        "kernel_function": custom_kernel,
+        "kernel": "epanechnikov",  # Use Epanechnikov kernel
         "shrinkage_intensity": 0.2,
         "distance_metric": "euclidean",
         "use_projection": True,
@@ -259,17 +255,14 @@ def demo_custom_parameters():
 
     print("Custom configuration results:")
     print(
-        f"  Pattern weights magnitude: {
-            np.linalg.norm(
-                explanation['pattern_weights']):.3f}"
+        f"  Pattern weights magnitude: {np.linalg.norm(explanation['pattern_weights']):.3f}"
     )
     print(
-        f"  LIME weights magnitude: {
-            np.linalg.norm(
-                explanation['lime_weights']):.3f}"
+        f"  LIME weights magnitude: {np.linalg.norm(explanation['lime_weights']):.3f}"
     )
     print(f"  Simplification method: {explainer.simplification_method}")
     print(f"  Solver method: {explainer.solver_method}")
+    print(f"  Available kernels: {KernelRegistry.list_available()}")
     print()
 
 
@@ -336,6 +329,50 @@ def demo_real_dataset():
         print()
 
 
+def demo_kernel_comparison():
+    """Demonstrate different kernel functions."""
+    print("=== Kernel Comparison Demo ===")
+
+    X_train, X_test, y_train, y_test = create_synthetic_data()
+    model = train_model(X_train, y_train)
+
+    def predict_fn(X):
+        return model.predict_proba(X)
+
+    instance = X_test[0]
+    available_kernels = KernelRegistry.list_available()
+
+    for kernel_name in available_kernels:
+        solver_params = {
+            "k_ratio": 0.15,
+            "kernel": kernel_name,
+            "distance_metric": "euclidean",
+            "use_projection": True,
+        }
+
+        explainer = PatternLocalExplainer(
+            simplification="none",
+            solver="local_covariance",
+            solver_params=solver_params,
+            random_state=42,
+        )
+
+        explainer.fit(X_train)
+        explanation = explainer.explain_instance(
+            instance=instance,
+            predict_fn=predict_fn,
+            X_train=X_train,
+        )
+
+        print(f"\nResults with {kernel_name} kernel:")
+        print(
+            f"  Pattern weights magnitude: {np.linalg.norm(explanation['pattern_weights']):.3f}"
+        )
+        print(
+            f"  LIME weights magnitude: {np.linalg.norm(explanation['lime_weights']):.3f}"
+        )
+
+
 if __name__ == "__main__":
     # Run all demos
     demo_basic_usage()
@@ -343,6 +380,7 @@ if __name__ == "__main__":
     demo_lowrank_simplification()
     demo_custom_parameters()
     demo_real_dataset()
+    demo_kernel_comparison()
 
     print("=== Demo Complete ===")
     print("The PatternLocal package provides a unified interface for:")

@@ -24,7 +24,7 @@ class LimeConfig:
     num_samples: int = 5000
     feature_selection: str = "auto"
     discretize_continuous: bool = True
-    kernel_width: Optional[float] = None
+    bandwidth: Optional[float] = None
     sample_around_instance: bool = True
     verbose: bool = False
     labels: Optional[list] = None
@@ -41,10 +41,10 @@ class LimeConfig:
         if self.mode == "image":
             if self.feature_selection == "auto":
                 self.feature_selection = "none"
-            if self.kernel_width is None:
-                self.kernel_width = 0.25
+            if self.bandwidth is None:
+                self.bandwidth = 0.25
         elif self.mode == "tabular":
-            if self.kernel_width is None:
+            if self.bandwidth is None:
                 pass  # LIME will auto-estimate
 
     def to_dict(self) -> Dict[str, Any]:
@@ -62,10 +62,10 @@ class LimeConfig:
                     "sample_around_instance": self.sample_around_instance,
                 }
             )
-            if self.kernel_width is not None:
-                config["kernel_width"] = self.kernel_width
+            if self.bandwidth is not None:
+                config["bandwidth"] = self.bandwidth
         else:  # image mode
-            config.update({"kernel_width": self.kernel_width, "labels": self.labels})
+            config.update({"bandwidth": self.bandwidth, "labels": self.labels})
 
         return config
 

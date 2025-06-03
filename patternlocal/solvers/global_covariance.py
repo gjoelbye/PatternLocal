@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 
-from ..exceptions import ComputationalError
+from ..exceptions import ComputationalError, ValidationError
 from .base import BaseSolver
 from .registry import SolverRegistry
 
@@ -23,15 +23,22 @@ class GlobalCovarianceSolver(BaseSolver):
     where w are LIME weights and C_global is the global covariance matrix.
     """
 
+    # Set of known parameters for global covariance solver
+    KNOWN_PARAMS = set()
+
     def __init__(self, params: Optional[Dict[str, Any]] = None):
         """Initialize GlobalCovarianceSolver.
 
         Args:
-            params: Parameters for global covariance
-                - regularization: Regularization parameter for covariance matrix (default: 1e-6)
+            params: Parameters (unused for this solver)
         """
         super().__init__(params)
-        self.regularization = self.params.get("regularization", 1e-6)
+
+        # Check for unknown parameters
+        if params:
+            raise ValidationError(
+                f"This solver does not accept any parameters, but got: {list(params.keys())}"
+            )
 
     def solve(
         self,
@@ -58,10 +65,6 @@ class GlobalCovarianceSolver(BaseSolver):
         try:
             # Compute global covariance matrix
             global_cov = np.cov(X_train, rowvar=False)
-
-            # Add regularization to prevent singular matrices
-            if self.regularization > 0:
-                global_cov += self.regularization * np.eye(global_cov.shape[0])
 
             # Apply to LIME weights
             patternlocal_weights = lime_weights @ global_cov

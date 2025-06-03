@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional
 import numpy as np
 from sklearn.linear_model import Ridge
 
-from ..exceptions import ComputationalError
+from ..exceptions import ComputationalError, ValidationError
 from .local_base import LocalSolverBase
 from .registry import SolverRegistry
 
@@ -22,6 +22,12 @@ class RidgeSolver(LocalSolverBase):
     The Ridge coefficients provide the patternlocal weights.
     """
 
+    # Set of known parameters for Ridge solver
+    KNOWN_PARAMS = LocalSolverBase.KNOWN_PARAMS | {
+        "alpha",
+        "fit_intercept",
+    }
+
     def __init__(self, params: Optional[Dict[str, Any]] = None):
         """Initialize RidgeSolver.
 
@@ -31,10 +37,38 @@ class RidgeSolver(LocalSolverBase):
                 - fit_intercept: Whether to fit intercept in Ridge (default: False)
                 Plus all LocalSolverBase parameters (k_ratio, bandwidth, etc.)
         """
+        # Initialize parameters before validation
+        params = params or {}
+        self.alpha = params.get("alpha", 1.0)
+        self.fit_intercept = params.get("fit_intercept", True)
+
+        # Check for unknown parameters before calling super().__init__
+        unknown_params = set(params.keys()) - self.KNOWN_PARAMS
+        if unknown_params:
+            raise ValidationError(
+                f"Unknown parameters for {self.__class__.__name__}: {unknown_params}"
+            )
+
         super().__init__(params)
 
-        self.alpha = self.params.get("alpha", 1.0)
-        self.fit_intercept = self.params.get("fit_intercept", False)
+        # Validate parameters
+        self._validate_params()
+
+    def _validate_params(self) -> None:
+        """Validate Ridge solver parameters.
+
+        Raises:
+            ValidationError: If parameters are invalid
+        """
+        # Validate alpha
+        if not isinstance(self.alpha, (int, float)):
+            raise ValidationError("alpha must be numeric")
+        if self.alpha < 0:
+            raise ValidationError("alpha must be non-negative")
+
+        # Validate fit_intercept
+        if not isinstance(self.fit_intercept, bool):
+            raise ValidationError("fit_intercept must be boolean")
 
     def solve(
         self,

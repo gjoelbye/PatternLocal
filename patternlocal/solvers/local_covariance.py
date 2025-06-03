@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 
-from ..exceptions import ComputationalError
+from ..exceptions import ComputationalError, ValidationError
 from .local_base import LocalSolverBase
 from .registry import SolverRegistry
 
@@ -22,6 +22,11 @@ class LocalCovarianceSolver(LocalSolverBase):
     where w are LIME weights and C_local is the locally estimated covariance matrix.
     """
 
+    # Set of known parameters for local covariance solver
+    KNOWN_PARAMS = LocalSolverBase.KNOWN_PARAMS | {
+        "shrinkage_intensity",
+    }
+
     def __init__(self, params: Optional[Dict[str, Any]] = None):
         """Initialize LocalCovarianceSolver.
 
@@ -29,13 +34,38 @@ class LocalCovarianceSolver(LocalSolverBase):
             params: Parameters for local covariance estimation
                 - k_ratio: Ratio of samples to use for local estimation (default: 0.1)
                 - bandwidth: Kernel bandwidth (default: None, auto-estimate)
-                - kernel_function: Kernel function (default: gaussian_kernel)
+                - kernel: Kernel function (default: gaussian)
                 - shrinkage_intensity: Shrinkage regularization (default: 0.0)
                 - distance_metric: Distance metric (default: 'euclidean')
                 - use_projection: Whether to project point onto hyperplane (default: True)
         """
+        # Initialize parameters before validation
+        params = params or {}
+        self.shrinkage_intensity = params.get("shrinkage_intensity", 0.0)
+
+        # Check for unknown parameters before calling super().__init__
+        unknown_params = set(params.keys()) - self.KNOWN_PARAMS
+        if unknown_params:
+            raise ValidationError(
+                f"Unknown parameters for {self.__class__.__name__}: {unknown_params}"
+            )
+
         super().__init__(params)
-        self.shrinkage_intensity = self.params.get("shrinkage_intensity", 0.0)
+
+        # Validate parameters
+        self._validate_params()
+
+    def _validate_params(self) -> None:
+        """Validate local covariance solver parameters.
+
+        Raises:
+            ValidationError: If parameters are invalid
+        """
+        # Validate shrinkage_intensity
+        if not isinstance(self.shrinkage_intensity, (int, float)):
+            raise ValidationError("shrinkage_intensity must be numeric")
+        if not 0 <= self.shrinkage_intensity <= 1:
+            raise ValidationError("shrinkage_intensity must be between 0 and 1")
 
     def solve(
         self,

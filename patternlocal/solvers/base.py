@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 
-from ..config.validation import ParameterValidator
+from ..exceptions import ValidationError
 
 
 class BaseSolver(ABC):
@@ -53,7 +53,7 @@ class BaseSolver(ABC):
         lime_intercept: float,
         instance: np.ndarray,
         X_train: np.ndarray,
-    ):
+    ) -> None:
         """Validate common input arguments.
 
         Args:
@@ -65,9 +65,50 @@ class BaseSolver(ABC):
         Raises:
             ValidationError: If inputs are invalid
         """
-        ParameterValidator.validate_solver_inputs(
-            lime_weights, lime_intercept, instance, X_train
-        )
+        # Validate array types and shapes
+        if not isinstance(lime_weights, np.ndarray):
+            raise ValidationError("lime_weights must be a numpy array")
+        if not isinstance(instance, np.ndarray):
+            raise ValidationError("instance must be a numpy array")
+        if not isinstance(X_train, np.ndarray):
+            raise ValidationError("X_train must be a numpy array")
+
+        # Validate array dimensions
+        if lime_weights.ndim != 1:
+            raise ValidationError(
+                f"lime_weights must be 1-dimensional, got {lime_weights.ndim}"
+            )
+        if instance.ndim != 1:
+            raise ValidationError(
+                f"instance must be 1-dimensional, got {instance.ndim}"
+            )
+        if X_train.ndim != 2:
+            raise ValidationError(f"X_train must be 2-dimensional, got {X_train.ndim}")
+
+        # Validate array contents
+        for name, arr in [
+            ("lime_weights", lime_weights),
+            ("instance", instance),
+            ("X_train", X_train),
+        ]:
+            if np.any(np.isnan(arr)):
+                raise ValidationError(f"{name} contains NaN values")
+            if np.any(np.isinf(arr)):
+                raise ValidationError(f"{name} contains infinite values")
+
+        # Validate intercept
+        if not np.isscalar(lime_intercept):
+            raise ValidationError("lime_intercept must be a scalar")
+        if np.isnan(lime_intercept) or np.isinf(lime_intercept):
+            raise ValidationError("lime_intercept must be finite")
+
+        # Validate shapes match
+        if lime_weights.shape[0] != instance.shape[0]:
+            raise ValidationError("lime_weights and instance must have same length")
+        if X_train.shape[1] != instance.shape[0]:
+            raise ValidationError(
+                "X_train feature dimension must match instance length"
+            )
 
     @property
     def solver_type(self) -> str:
