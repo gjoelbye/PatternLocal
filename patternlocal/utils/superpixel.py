@@ -33,7 +33,7 @@ def slic_segmentation(instance, dims=(64, 64), n_segments=200, compactness=8, si
     Applies SLIC segmentation to the input image.
 
     Args:
-        instance: The input image as a 3D numpy array (H, W, C).
+        instance: The input image as a flattened array.
         dims (tuple): The dimensions to resize/crop the image to (H, W).
         n_segments (int): Approximate number of superpixels.
         compactness (float): Balances color and spatial proximity.
@@ -42,8 +42,16 @@ def slic_segmentation(instance, dims=(64, 64), n_segments=200, compactness=8, si
     Returns:
         Flattened segmentation map.
     """
-    instance = instance.flatten()
-    resized = gray2rgb(instance.reshape(*dims))
+    # Check if input is RGB (size is H*W*3)
+    is_rgb = len(instance) == dims[0] * dims[1] * 3
+
+    if is_rgb:
+        # For RGB, reshape to H x W x 3
+        resized = instance.reshape(*dims, 3)
+    else:
+        # For grayscale, reshape to H x W and convert to RGB
+        resized = gray2rgb(instance.reshape(*dims))
+
     seg_map = slic(
         resized,
         n_segments=n_segments,
@@ -53,7 +61,8 @@ def slic_segmentation(instance, dims=(64, 64), n_segments=200, compactness=8, si
     )
 
     seg_map = seg_map.flatten()
-    seg_map[instance == 0] = 0
+    if not is_rgb:
+        seg_map[instance == 0] = 0
     seg_map = seg_map.reshape(*dims)
 
     # Relabel segments for better visualization
@@ -64,4 +73,4 @@ def slic_segmentation(instance, dims=(64, 64), n_segments=200, compactness=8, si
         seg_map_tmp[seg_map == seg] = ii
     seg_map = seg_map_tmp
 
-    return seg_map.flatten()
+    return seg_map.flatten().astype(np.int32)  # Ensure int32 dtype

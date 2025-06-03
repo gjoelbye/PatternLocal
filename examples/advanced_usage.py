@@ -91,7 +91,7 @@ def fluent_interface_example():
         PatternLocalExplainer()
         .with_simplification("lowrank", n_components=8)
         .with_solver("local_covariance", k_ratio=0.15, shrinkage_intensity=0.1)
-        .with_lime_params(num_samples=3000, feature_selection="auto")
+        .with_lime_params(num_samples=3000)
         .fit(X_train)
     )
 

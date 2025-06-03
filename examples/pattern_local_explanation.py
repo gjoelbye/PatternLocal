@@ -62,7 +62,14 @@ def demonstrate_pattern_local_explanation():
     X_train, X_test, y_train, y_test = create_tabular_data()
     model = train_model(X_train, y_train)
 
+    # Convert DataFrames to numpy arrays for the explainer
+    X_train_np = X_train.values
+
     def predict_fn(X):
+        # Convert to DataFrame if needed for the model
+        if isinstance(X, np.ndarray) and len(X.shape) == 2:
+            X_df = pd.DataFrame(X, columns=X_train.columns)
+            return model.predict_proba(X_df)
         return model.predict_proba(X)
 
     # Initialize PatternLocal explainer
@@ -79,11 +86,12 @@ def demonstrate_pattern_local_explanation():
     )
 
     # Fit the explainer to the training data
-    explainer.fit(X_train)
+    explainer.fit(X_train_np)
 
     # Select an instance to explain
     instance_idx = 0
     instance = X_test.iloc[instance_idx]
+    instance_np = instance.values
 
     # Get the model's prediction
     pred_proba = predict_fn(instance.values.reshape(1, -1))[0]
@@ -95,7 +103,7 @@ def demonstrate_pattern_local_explanation():
 
     # Generate PatternLocal explanation
     explanation = explainer.explain_instance(
-        instance=instance.values, predict_fn=predict_fn, X_train=X_train.values
+        instance=instance_np, predict_fn=predict_fn, X_train=X_train_np
     )
 
     # Extract pattern weights and LIME weights
@@ -217,13 +225,14 @@ def demonstrate_real_world_example():
         X, y, test_size=0.2, random_state=42
     )
 
-    # Standardize
+    # Standardize and convert to numpy arrays
     scaler = StandardScaler()
-    X_train = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns)
-    X_test = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns)
+    X_train_np = scaler.fit_transform(X_train)
+    X_test_np = scaler.transform(X_test)
+    feature_names = X_train.columns
 
     # Train model
-    model = train_model(X_train, y_train)
+    model = train_model(X_train_np, y_train)
 
     def predict_fn(X):
         return model.predict_proba(X)
@@ -243,14 +252,15 @@ def demonstrate_real_world_example():
         {"name": "Lasso pattern", "solver": "lasso", "solver_params": {"alpha": 0.01}},
     ]
 
-    instance = X_test.iloc[0]
+    instance = X_test_np[0]
 
-    pred_result = predict_fn(instance.values.reshape(1, -1))
+    pred_result = predict_fn(instance.reshape(1, -1))
     print(f"Explaining instance with prediction: {pred_result[0][1]:.3f}")
     print(f"True label: {y_test[0]}")
-    print()
 
     for config in configs:
+        print(f"\nTesting solver: {config['name']}")
+
         explainer = PatternLocalExplainer(
             simplification="none",
             solver=config["solver"],
@@ -258,21 +268,28 @@ def demonstrate_real_world_example():
             random_state=42,
         )
 
-        explainer.fit(X_train)
+        explainer.fit(X_train_np)
         explanation = explainer.explain_instance(
-            instance=instance.values, predict_fn=predict_fn, X_train=X_train.values
+            instance=instance, predict_fn=predict_fn, X_train=X_train_np
         )
 
-        # Show top contributing features
-        pattern_weights = explanation["pattern_weights"]
-        top_indices = np.argsort(np.abs(pattern_weights))[-5:][::-1]
+        # Create feature importance DataFrame
+        feature_importance = pd.DataFrame(
+            {
+                "Feature": feature_names,
+                "PatternLocal Weight": explanation["pattern_weights"],
+                "LIME Weight": explanation["lime_weights"],
+                "Absolute PatternLocal Weight": np.abs(explanation["pattern_weights"]),
+            }
+        )
 
-        print(f"{config['name']}:")
-        for i, idx in enumerate(top_indices):
-            feature_name = data.feature_names[idx]
-            weight = pattern_weights[idx]
-            print(f"  {i + 1}. {feature_name}: {weight:.3f}")
-        print()
+        # Show top features
+        print("\nTop 3 most important features:")
+        print(
+            feature_importance.nlargest(3, "Absolute PatternLocal Weight").to_string(
+                index=False
+            )
+        )
 
 
 if __name__ == "__main__":

@@ -52,6 +52,7 @@ class SuperpixelSimplification(BaseSimplification):
         # Internal state
         self.segments_ = None
         self.n_superpixels_ = None
+        self.is_rgb_ = None
 
     def fit(self, X_train: np.ndarray, **kwargs) -> "SuperpixelSimplification":
         """Fit the superpixel segmentation.
@@ -72,6 +73,9 @@ class SuperpixelSimplification(BaseSimplification):
             raise ValueError(
                 "image_shape must be provided either in params or as kwarg"
             )
+
+        # Check if input is RGB (size is H*W*3)
+        self.is_rgb_ = X_train.shape[1] == self.image_shape[0] * self.image_shape[1] * 3
 
         # Use first training image to create segmentation
         first_image = X_train[0] if len(X_train.shape) > 1 else X_train
@@ -105,14 +109,13 @@ class SuperpixelSimplification(BaseSimplification):
         except ImportError:
             raise ImportError("scikit-image is required for SLIC segmentation")
 
-        # Reshape image to 2D
-        image_2d = image.reshape(self.image_shape)
-
-        # Convert to RGB if needed
-        if len(image_2d.shape) == 2:
-            image_rgb = gray2rgb(image_2d)
+        if self.is_rgb_:
+            # For RGB, reshape to H x W x 3
+            image_rgb = image.reshape(*self.image_shape, 3)
         else:
-            image_rgb = image_2d
+            # For grayscale, reshape to H x W and convert to RGB
+            image_2d = image.reshape(self.image_shape)
+            image_rgb = gray2rgb(image_2d)
 
         # Apply SLIC
         segments = slic(
@@ -122,6 +125,10 @@ class SuperpixelSimplification(BaseSimplification):
             sigma=self.sigma,
             start_label=0,
         )
+
+        # Handle zero values for grayscale
+        if not self.is_rgb_:
+            segments[image_2d == 0] = 0
 
         return segments.flatten()
 
@@ -192,9 +199,21 @@ class SuperpixelSimplification(BaseSimplification):
         M = np.zeros((len(self.segments_), num_segments))
         M[np.arange(len(self.segments_)), seg_index] = 1
 
-        # Compute segment means
-        segment_sums = X.dot(M)
-        return segment_sums / counts
+        # For RGB, compute means for each channel
+        if self.is_rgb_:
+            # Reshape X to handle RGB channels separately
+            X_reshaped = X.reshape(X.shape[0], -1, 3)  # (N, H*W, 3)
+
+            # Compute means for each channel
+            means_r = X_reshaped[:, :, 0].dot(M) / counts
+            means_g = X_reshaped[:, :, 1].dot(M) / counts
+            means_b = X_reshaped[:, :, 2].dot(M) / counts
+
+            # Stack RGB means
+            return np.stack([means_r, means_g, means_b], axis=2).reshape(X.shape[0], -1)
+        else:
+            # For grayscale, compute single mean per segment
+            return X.dot(M) / counts
 
     def inverse_transform_weights(self, weights: np.ndarray) -> np.ndarray:
         """Transform weights from superpixel space back to pixel space.

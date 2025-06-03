@@ -223,7 +223,6 @@ def demo_custom_parameters():
     # Advanced configuration
     lime_params = {
         "num_samples": 10000,  # More samples for better stability
-        "feature_selection": "lasso_path",
         "discretize_continuous": False,
     }
 

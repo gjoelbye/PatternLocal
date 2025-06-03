@@ -119,10 +119,6 @@ class ExplainerConfig:
     simplification_params: Dict[str, Any] = field(default_factory=dict)
     solver_params: Dict[str, Any] = field(default_factory=dict)
     random_state: Optional[int] = None
-    enable_caching: bool = True
-    cache_size: int = 128
-    enable_parallel: bool = False
-    n_jobs: int = 1
 
     def __post_init__(self) -> None:
         """Validate and normalize configuration."""
@@ -131,12 +127,6 @@ class ExplainerConfig:
 
     def validate(self) -> None:
         """Validate configuration parameters."""
-        if self.cache_size <= 0:
-            raise ConfigurationError("cache_size must be positive")
-
-        if self.n_jobs < -1 or self.n_jobs == 0:
-            raise ConfigurationError("n_jobs must be -1 or positive integer")
-
         if self.random_state is not None and self.random_state < 0:
             raise ConfigurationError("random_state must be non-negative")
 
@@ -218,10 +208,6 @@ class ExplainerConfig:
             ),
             "solver_params": getattr(self.solver, "params", self.solver_params),
             "random_state": self.random_state,
-            "enable_caching": self.enable_caching,
-            "cache_size": self.cache_size,
-            "enable_parallel": self.enable_parallel,
-            "n_jobs": self.n_jobs,
         }
 
     def save_yaml(self, config_path: Union[str, Path]) -> None:
