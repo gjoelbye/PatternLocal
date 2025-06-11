@@ -251,7 +251,7 @@ explainer = PatternLocalExplainer(
 
 All solvers work with both tabular and image data:
 
-### LocalCovarianceSolver (Recommended)
+### LocalCovarianceSolver (Example)
 The main patternlocal method - estimates local covariance matrices.
 ```python
 solver_params = {
@@ -259,7 +259,7 @@ solver_params = {
     'bandwidth': None,               # Auto-estimate
     'shrinkage_intensity': 0.0,      # No regularization
     'distance_metric': 'euclidean',  # Distance metric
-    'use_projection': True           # Project onto LIME hyperplane
+    'use_projection': False          # Project onto LIME hyperplane
 }
 ```
 

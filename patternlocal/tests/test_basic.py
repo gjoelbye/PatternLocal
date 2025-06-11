@@ -8,7 +8,11 @@ from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
 
 from patternlocal import PatternLocalExplainer
-from patternlocal.exceptions import ConfigurationError, ValidationError
+from patternlocal.exceptions import (
+    ComputationalError,
+    ConfigurationError,
+    ValidationError,
+)
 from patternlocal.simplification import LowRankSimplification, NoSimplification
 from patternlocal.solvers import LassoSolver, LocalCovarianceSolver, NoSolver
 
@@ -243,6 +247,101 @@ class TestComponents:
         pattern_weights = solver.solve(lime_weights, lime_intercept, instance, X_train)
         assert pattern_weights.shape == lime_weights.shape
         assert not np.array_equal(pattern_weights, lime_weights)  # Should be different
+
+    def test_precomputed_distances(self):
+        """Test LocalCovarianceSolver with precomputed distances."""
+        np.random.seed(42)  # For reproducible results
+
+        lime_weights = np.random.randn(5)
+        lime_intercept = 0.5
+        instance = np.random.randn(5)
+        X_train = np.random.randn(20, 5)
+
+        # Test with computed distances vs precomputed distances
+        solver_computed = LocalCovarianceSolver(
+            {"k_ratio": 0.5, "distance_metric": "euclidean"}
+        )
+
+        # Compute distances manually using the same method
+        from patternlocal.utils.distance import calculate_distances
+
+        precomputed_dists = calculate_distances(X_train, instance, method="euclidean")
+
+        solver_precomputed = LocalCovarianceSolver(
+            {"k_ratio": 0.5, "precomputed_distances": precomputed_dists}
+        )
+
+        # Both should give the same results
+        pattern_weights_computed = solver_computed.solve(
+            lime_weights, lime_intercept, instance, X_train
+        )
+        pattern_weights_precomputed = solver_precomputed.solve(
+            lime_weights, lime_intercept, instance, X_train
+        )
+
+        np.testing.assert_array_almost_equal(
+            pattern_weights_computed, pattern_weights_precomputed
+        )
+
+        # Test validation: incorrect number of distances
+        wrong_size_distances = np.random.rand(15)  # X_train has 20 samples
+        with pytest.raises(
+            (ValidationError, ComputationalError), match="precomputed_distances length"
+        ):
+            solver_wrong = LocalCovarianceSolver(
+                {"k_ratio": 0.5, "precomputed_distances": wrong_size_distances}
+            )
+            solver_wrong.solve(lime_weights, lime_intercept, instance, X_train)
+
+        # Test validation: negative distances should fail at initialization
+        negative_distances = np.copy(precomputed_dists)
+        negative_distances[0] = -1.0
+        with pytest.raises(
+            ValidationError, match="precomputed_distances must be non-negative"
+        ):
+            LocalCovarianceSolver(
+                {"k_ratio": 0.5, "precomputed_distances": negative_distances}
+            )
+
+        # Test validation: NaN distances should fail at initialization
+        nan_distances = np.copy(precomputed_dists)
+        nan_distances[0] = np.nan
+        with pytest.raises(
+            ValidationError, match="precomputed_distances contains NaN values"
+        ):
+            LocalCovarianceSolver(
+                {"k_ratio": 0.5, "precomputed_distances": nan_distances}
+            )
+
+        # Test validation: infinite distances should fail at initialization
+        inf_distances = np.copy(precomputed_dists)
+        inf_distances[0] = np.inf
+        with pytest.raises(
+            ValidationError, match="precomputed_distances contains infinite values"
+        ):
+            LocalCovarianceSolver(
+                {"k_ratio": 0.5, "precomputed_distances": inf_distances}
+            )
+
+        # Test validation: wrong dimension should fail at initialization
+        wrong_dim_distances = np.random.rand(20, 2)  # Should be 1D
+        with pytest.raises(
+            ValidationError, match="precomputed_distances must be 1-dimensional"
+        ):
+            LocalCovarianceSolver(
+                {"k_ratio": 0.5, "precomputed_distances": wrong_dim_distances}
+            )
+
+        # Test validation: non-array should fail at initialization
+        with pytest.raises(
+            ValidationError, match="precomputed_distances must be a numpy array"
+        ):
+            LocalCovarianceSolver(
+                {
+                    "k_ratio": 0.5,
+                    "precomputed_distances": [1, 2, 3, 4, 5],  # List instead of array
+                }
+            )
 
 
 if __name__ == "__main__":

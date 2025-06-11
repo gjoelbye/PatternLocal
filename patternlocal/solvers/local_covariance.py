@@ -37,7 +37,8 @@ class LocalCovarianceSolver(LocalSolverBase):
                 - kernel: Kernel function (default: gaussian)
                 - shrinkage_intensity: Shrinkage regularization (default: 0.0)
                 - distance_metric: Distance metric (default: 'euclidean')
-                - use_projection: Whether to project point onto hyperplane (default: True)
+                - precomputed_distances: Precomputed distances array (default: None)
+                - use_projection: Whether to project point onto hyperplane (default: False)
         """
         # Initialize parameters before validation
         params = params or {}
@@ -61,6 +62,9 @@ class LocalCovarianceSolver(LocalSolverBase):
         Raises:
             ValidationError: If parameters are invalid
         """
+        # Call parent validation first
+        super()._validate_params()
+
         # Validate shrinkage_intensity
         if not isinstance(self.shrinkage_intensity, (int, float)):
             raise ValidationError("shrinkage_intensity must be numeric")

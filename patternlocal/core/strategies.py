@@ -164,9 +164,11 @@ class TabularModeStrategy(LimeModeStrategy):
         return lime_tabular.LimeTabularExplainer(
             X_train,
             feature_selection="none",  # Force feature selection to none until implemented
-            discretize_continuous=validated_params.get("discretize_continuous", True),
+            discretize_continuous=validated_params.get("discretize_continuous", False),
             kernel_width=validated_params.get("bandwidth", None),
-            sample_around_instance=validated_params.get("sample_around_instance", True),
+            sample_around_instance=validated_params.get(
+                "sample_around_instance", False
+            ),
             random_state=random_state,
         )
 

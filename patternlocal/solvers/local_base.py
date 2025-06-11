@@ -29,6 +29,7 @@ class LocalSolverBase(BaseSolver):
         "bandwidth",
         "kernel",
         "distance_metric",
+        "precomputed_distances",
         "use_projection",
     }
 
@@ -40,6 +41,7 @@ class LocalSolverBase(BaseSolver):
             - bandwidth: Kernel bandwidth (default: None, auto-estimate)
             - kernel: Kernel function name (default: 'gaussian')
             - distance_metric: Distance metric (default: 'euclidean')
+            - precomputed_distances: Precomputed distances array (default: None)
             - use_projection: Whether to project point onto hyperplane (default: False)
         """
         super().__init__(params)
@@ -61,6 +63,7 @@ class LocalSolverBase(BaseSolver):
             )
         self.kernel_function = KernelRegistry.create(kernel_name)
         self.distance_metric = self.params.get("distance_metric", "euclidean")
+        self.precomputed_distances = self.params.get("precomputed_distances", None)
         self.use_projection = self.params.get("use_projection", False)
 
         # Validate parameters
@@ -95,6 +98,19 @@ class LocalSolverBase(BaseSolver):
         valid_metrics = ["euclidean", "manhattan", "cosine"]
         if self.distance_metric not in valid_metrics:
             raise ValidationError(f"distance_metric must be one of {valid_metrics}")
+
+        # Validate precomputed_distances
+        if self.precomputed_distances is not None:
+            if not isinstance(self.precomputed_distances, np.ndarray):
+                raise ValidationError("precomputed_distances must be a numpy array")
+            if self.precomputed_distances.ndim != 1:
+                raise ValidationError("precomputed_distances must be 1-dimensional")
+            if np.any(self.precomputed_distances < 0):
+                raise ValidationError("precomputed_distances must be non-negative")
+            if np.any(np.isnan(self.precomputed_distances)):
+                raise ValidationError("precomputed_distances contains NaN values")
+            if np.any(np.isinf(self.precomputed_distances)):
+                raise ValidationError("precomputed_distances contains infinite values")
 
         # Validate use_projection
         if not isinstance(self.use_projection, bool):
@@ -133,8 +149,18 @@ class LocalSolverBase(BaseSolver):
         # Handle k parameter
         k = self._get_k_neighbors(n_total_samples)
 
-        # Compute distances
-        distances = calculate_distances(X_train, point, method=self.distance_metric)
+        # Use precomputed distances if available, otherwise compute them
+        if self.precomputed_distances is not None:
+            # Validate precomputed distances size matches training data
+            if len(self.precomputed_distances) != n_total_samples:
+                raise ValidationError(
+                    f"precomputed_distances length ({len(self.precomputed_distances)}) "
+                    f"must match X_train number of samples ({n_total_samples})"
+                )
+            distances = self.precomputed_distances.copy()
+        else:
+            # Compute distances using specified metric
+            distances = calculate_distances(X_train, point, method=self.distance_metric)
 
         # Get k nearest neighbors
         sorted_indices = np.argsort(distances)

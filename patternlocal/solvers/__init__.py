@@ -6,6 +6,7 @@ from LIME weights and local data.
 """
 
 from .base import BaseSolver
+from .elasticnet import ElasticNetSolver
 from .global_covariance import GlobalCovarianceSolver
 from .lasso import LassoSolver
 from .local_covariance import LocalCovarianceSolver
@@ -21,4 +22,5 @@ __all__ = [
     "LocalCovarianceSolver",
     "LassoSolver",
     "RidgeSolver",
+    "ElasticNetSolver",
 ]

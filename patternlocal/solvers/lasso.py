@@ -37,7 +37,8 @@ class LassoSolver(LocalSolverBase):
                 - alpha: Lasso regularization parameter (default: 1.0)
                 - max_iter: Maximum iterations for Lasso (default: 1000)
                 - fit_intercept: Whether to fit intercept in Lasso (default: False)
-                Plus all LocalSolverBase parameters (k_ratio, bandwidth, etc.)
+                Plus all LocalSolverBase parameters (k_ratio, bandwidth, kernel,
+                distance_metric, precomputed_distances, use_projection)
         """
         # Initialize parameters before validation
         params = params or {}
@@ -63,6 +64,9 @@ class LassoSolver(LocalSolverBase):
         Raises:
             ValidationError: If parameters are invalid
         """
+        # Call parent validation first
+        super()._validate_params()
+
         # Validate alpha
         if not isinstance(self.alpha, (int, float)):
             raise ValidationError("alpha must be numeric")

@@ -1,46 +1,52 @@
 """
-Ridge solver for patternlocal computation.
+ElasticNet solver for patternlocal computation.
 """
 
 from typing import Any, Dict, Optional
 
 import numpy as np
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import ElasticNet
 
 from ..exceptions import ComputationalError, ValidationError
 from .local_base import LocalSolverBase
 from .registry import SolverRegistry
 
 
-@SolverRegistry.register("ridge")
-class RidgeSolver(LocalSolverBase):
-    """Ridge patternlocal solver.
+@SolverRegistry.register("elasticnet")
+class ElasticNetSolver(LocalSolverBase):
+    """ElasticNet patternlocal solver.
 
-    It fits a Ridge model to predict LIME weights from the local data features,
-    weighted by proximity to the instance being explained.
+    It fits an ElasticNet model to predict LIME weights from the local data features,
+    weighted by proximity to the instance being explained. ElasticNet combines L1 and L2
+    regularization, providing both feature selection and stability benefits.
 
-    The Ridge coefficients provide the patternlocal weights.
+    The ElasticNet coefficients provide the patternlocal weights.
     """
 
-    # Set of known parameters for Ridge solver
+    # Set of known parameters for ElasticNet solver
     KNOWN_PARAMS = LocalSolverBase.KNOWN_PARAMS | {
         "alpha",
+        "l1_ratio",
         "fit_intercept",
     }
 
     def __init__(self, params: Optional[Dict[str, Any]] = None):
-        """Initialize RidgeSolver.
+        """Initialize ElasticNetSolver.
 
         Args:
-            params: Parameters for Ridge solver
-                - alpha: Ridge regularization parameter (default: 1.0)
-                - fit_intercept: Whether to fit intercept in Ridge (default: False)
+            params: Parameters for ElasticNet solver
+                - alpha: Regularization strength (default: 1.0)
+                - l1_ratio: ElasticNet mixing parameter, 0 <= l1_ratio <= 1 (default: 0.5)
+                    l1_ratio=0 corresponds to L2 penalty (Ridge)
+                    l1_ratio=1 corresponds to L1 penalty (Lasso)
+                - fit_intercept: Whether to fit intercept (default: True)
                 Plus all LocalSolverBase parameters (k_ratio, bandwidth, kernel,
                 distance_metric, precomputed_distances, use_projection)
         """
         # Initialize parameters before validation
         params = params or {}
         self.alpha = params.get("alpha", 1.0)
+        self.l1_ratio = params.get("l1_ratio", 0.5)
         self.fit_intercept = params.get("fit_intercept", True)
 
         # Check for unknown parameters before calling super().__init__
@@ -56,7 +62,7 @@ class RidgeSolver(LocalSolverBase):
         self._validate_params()
 
     def _validate_params(self) -> None:
-        """Validate Ridge solver parameters.
+        """Validate ElasticNet solver parameters.
 
         Raises:
             ValidationError: If parameters are invalid
@@ -70,6 +76,12 @@ class RidgeSolver(LocalSolverBase):
         if self.alpha < 0:
             raise ValidationError("alpha must be non-negative")
 
+        # Validate l1_ratio
+        if not isinstance(self.l1_ratio, (int, float)):
+            raise ValidationError("l1_ratio must be numeric")
+        if not 0 <= self.l1_ratio <= 1:
+            raise ValidationError("l1_ratio must be between 0 and 1")
+
         # Validate fit_intercept
         if not isinstance(self.fit_intercept, bool):
             raise ValidationError("fit_intercept must be boolean")
@@ -82,7 +94,7 @@ class RidgeSolver(LocalSolverBase):
         X_train: np.ndarray,
         **kwargs,
     ) -> np.ndarray:
-        """Compute patternlocal weights using local Ridge regression.
+        """Compute patternlocal weights using local ElasticNet regression.
 
         Args:
             lime_weights: LIME explanation weights
@@ -92,7 +104,7 @@ class RidgeSolver(LocalSolverBase):
             **kwargs: Additional arguments (unused)
 
         Returns:
-           patternlocal explanation weights (Ridge coefficients)
+           patternlocal explanation weights (ElasticNet coefficients)
         """
         self._validate_inputs(lime_weights, lime_intercept, instance, X_train)
 
@@ -107,15 +119,18 @@ class RidgeSolver(LocalSolverBase):
             # Target is the LIME prediction for each local sample
             y_target = X_local @ lime_weights + lime_intercept
 
-            # Fit Ridge model: X_local (features) -> y_target (LIME predictions)
-            # We want to find coefficients that map features to LIME
-            # predictions
-            ridge = Ridge(alpha=self.alpha, fit_intercept=self.fit_intercept)
+            # Fit ElasticNet model: X_local (features) -> y_target (LIME predictions)
+            # We want to find coefficients that map features to LIME predictions
+            elasticnet = ElasticNet(
+                alpha=self.alpha,
+                l1_ratio=self.l1_ratio,
+                fit_intercept=self.fit_intercept,
+            )
 
-            # Fit Ridge with sample weights
-            ridge.fit(X_local, y_target, sample_weight=sample_weights)
+            # Fit ElasticNet with sample weights
+            elasticnet.fit(X_local, y_target, sample_weight=sample_weights)
 
-            return ridge.coef_
+            return elasticnet.coef_
 
         except Exception as e:
-            raise ComputationalError(f"Error computing Ridge patternlocal: {e}")
+            raise ComputationalError(f"Error computing ElasticNet patternlocal: {e}")

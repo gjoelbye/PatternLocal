@@ -71,6 +71,14 @@ from .solvers.registry import SolverRegistry
 # Utilities
 from .utils import calculate_distances, project_point_onto_hyperplane
 
+# Optimization (optional import)  # noqa: F401
+try:
+    from .optimization import OptimizedPatternLocalExplainer  # noqa: F401
+
+    _OPTIMIZATION_AVAILABLE = True  # noqa: F401
+except ImportError:
+    _OPTIMIZATION_AVAILABLE = False  # noqa: F401
+
 # Package metadata
 __version__ = "2.0.0"
 __author__ = "PatternXAI Team"
@@ -113,6 +121,10 @@ __all__ = [
     "FittingError",
     "ComputationalError",
 ]
+
+# Add optimization components if available
+if _OPTIMIZATION_AVAILABLE:
+    __all__.append("OptimizedPatternLocalExplainer")
 
 
 def list_simplification_methods():
