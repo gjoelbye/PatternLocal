@@ -122,7 +122,7 @@ def demo_different_solvers():
 
         results[solver_name] = explanation["pattern_weights"]
         print(
-            f"  Weight magnitude: {np.linalg.norm( explanation['pattern_weights']):.3f}"
+            f"  Weight magnitude: {np.linalg.norm(explanation['pattern_weights']):.3f}"
         )
 
     print()
@@ -193,7 +193,7 @@ def demo_lowrank_simplification():
             f"  Pattern weights shape: {explanation['pattern_weights'].shape}"
         )
         print(
-            f"  Weight magnitude: {np.linalg.norm( explanation['pattern_weights']):.3f}"
+            f"  Weight magnitude: {np.linalg.norm(explanation['pattern_weights']):.3f}"
         )
 
         if hasattr(explainer.simplification, "n_components_fitted"):

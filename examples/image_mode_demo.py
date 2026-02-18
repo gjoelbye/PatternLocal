@@ -303,9 +303,8 @@ def demo_different_solvers():
         )
 
         pattern_weights = explanation["pattern_weights"]
-        print(
-            f"    Mode: {explainer.mode} | Weights range: [{pattern_weights.min():.3f}, {pattern_weights.max():.3f}]"
-        )
+        pw_min, pw_max = pattern_weights.min(), pattern_weights.max()
+        print(f"    Mode: {explainer.mode} | Weights range: [{pw_min:.3f}, {pw_max:.3f}]")
 
 
 if __name__ == "__main__":
