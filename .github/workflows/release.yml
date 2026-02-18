@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  pull_request:
+    branches: ['main']
+
+  push:
+    tags:
+      - 'v*'
+      
+permissions:
+  contents: read
+  id-token: write   # keep if you migrate to Trusted Publishing
+
+jobs:
+  checks:
+    name: Lint & tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+      - name: Install project (+dev extras)
+        run: |
+          python -m pip install -U pip build
+          pip install -e ".[dev]"
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files --show-diff-on-failure --color=always
+      - name: Run tests
+        run: pytest --cov=patternlocal
+
+  publish:
+    name: Build & upload to PyPI
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+      - name: Build distributions
+        run: |
+          python -m pip install -U pip build
+          python -m build --sdist --wheel --outdir dist
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

@@ -1,0 +1,23 @@
+# Development dependencies
+pytest>=6.0
+pytest-cov>=2.0
+black>=21.0
+isort>=5.0
+flake8>=3.8
+mypy>=0.900
+flake8-pyproject>=1.0.0
+types-PyYAML
+pre-commit>=2.0
+
+# Documentation
+sphinx>=4.0
+sphinx-rtd-theme>=1.0
+sphinx-autodoc-typehints>=1.12
+
+# Examples and visualization
+matplotlib>=3.3.0
+jupyter>=1.0.0
+seaborn>=0.11.0
+
+# Optional dependencies for full functionality
+scikit-image>=0.18.0 

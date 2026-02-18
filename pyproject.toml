@@ -1,0 +1,128 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "patternlocal"
+version = "2.0.0"
+description = "PatternLocal explanations for machine learning models"
+readme = "README.md"
+authors = [
+    {name = "Anders Gjølbye Madsen", email = "agjma@dtu.dk"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["explainable-ai", "machine-learning", "causality", "lime", "interpretability", "supressor-variables", "pattern"]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.19.0",
+    "scikit-learn>=1.0.0",
+    "scipy>=1.7.0",
+    "lime>=0.2.0",
+    "scikit-image>=0.18.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "black>=21.0",
+    "isort>=5.0",
+    "flake8>=3.8",
+    "mypy>=0.900",
+    "pre-commit>=2.0",
+]
+examples = [
+    "matplotlib>=3.3.0",
+    "jupyter>=1.0.0",
+    "seaborn>=0.11.0",
+]
+timeseries = [
+    "tslearn>=0.5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/gjoelbye/PatternLocal"
+Documentation = "https://github.com/gjoelbye/PatternLocal"
+Repository = "https://github.com/gjoelbye/PatternLocal"
+Paper = "https://arxiv.org/abs/2505.11210"
+
+[tool.setuptools]
+packages = ["patternlocal"]
+
+[tool.setuptools.package-data]
+patternlocal = ["py.typed"]
+
+# Black code formatting
+[tool.black]
+line-length = 88
+target-version = ['py313']
+include = '\.pyi?$'
+
+# Flake8 formatting
+[tool.flake8]
+max-line-length = 100 
+extend-ignore = ["E203"]
+
+# isort import sorting
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+# MyPy type checking
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["patternlocal/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["patternlocal"]
+omit = ["*/tests/*", "*/test_*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+] 
