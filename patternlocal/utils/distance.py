@@ -8,7 +8,9 @@ import numpy as np
 from scipy.spatial.distance import cdist
 from sklearn.metrics.pairwise import euclidean_distances, manhattan_distances
 
-DistanceMetric = Literal["euclidean", "manhattan", "cosine", "chebyshev", "minkowski", "dtw"]
+DistanceMetric = Literal[
+    "euclidean", "manhattan", "cosine", "chebyshev", "minkowski", "dtw"
+]
 
 
 def calculate_distances(

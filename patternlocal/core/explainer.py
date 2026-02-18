@@ -288,9 +288,7 @@ class PatternLocalExplainer:
             ValidationError: If inputs are invalid
         """
         try:
-            self.logger.info(
-                f"Fitting explainer on {X_train.shape[0]} samples"
-            )
+            self.logger.info(f"Fitting explainer on {X_train.shape[0]} samples")
 
             # Validate training data
             ParameterValidator.validate_training_data(X_train)

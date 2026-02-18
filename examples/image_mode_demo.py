@@ -133,9 +133,7 @@ def demo_unified_api():
     print(
         f"Pattern weights range: [{pattern_weights.min():.3f}, {pattern_weights.max():.3f}]"
     )
-    print(
-        f"LIME weights range: [{lime_weights.min():.3f}, {lime_weights.max():.3f}]"
-    )
+    print(f"LIME weights range: [{lime_weights.min():.3f}, {lime_weights.max():.3f}]")
     print(f"LIME intercept: {lime_intercept:.3f}")
 
     # Visualize results
@@ -247,9 +245,7 @@ def demo_mode_comparison():
     explainer_img.fit(X_image, image_shape=image_shape)
     print(f"    Mode: {explainer_img.mode}")
     print(f"    Simplification: {explainer_img.simplification_method}")
-    print(
-        f"    Number of superpixels: {explainer_img.simplification.n_superpixels}"
-    )
+    print(f"    Number of superpixels: {explainer_img.simplification.n_superpixels}")
 
     explanation_img = explainer_img.explain_instance(
         X_image[0], predict_fn_img, X_image, labels=[1]
@@ -304,7 +300,9 @@ def demo_different_solvers():
 
         pattern_weights = explanation["pattern_weights"]
         pw_min, pw_max = pattern_weights.min(), pattern_weights.max()
-        print(f"    Mode: {explainer.mode} | Weights range: [{pw_min:.3f}, {pw_max:.3f}]")
+        print(
+            f"    Mode: {explainer.mode} | Weights range: [{pw_min:.3f}, {pw_max:.3f}]"
+        )
 
 
 if __name__ == "__main__":

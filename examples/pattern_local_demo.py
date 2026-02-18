@@ -189,17 +189,13 @@ def demo_lowrank_simplification():
             instance=instance, predict_fn=predict_fn, X_train=X_train
         )
 
-        print(
-            f"  Pattern weights shape: {explanation['pattern_weights'].shape}"
-        )
+        print(f"  Pattern weights shape: {explanation['pattern_weights'].shape}")
         print(
             f"  Weight magnitude: {np.linalg.norm(explanation['pattern_weights']):.3f}"
         )
 
         if hasattr(explainer.simplification, "n_components_fitted"):
-            print(
-                f"  PCA components: {explainer.simplification.n_components_fitted}"
-            )
+            print(f"  PCA components: {explainer.simplification.n_components_fitted}")
 
     print()
 

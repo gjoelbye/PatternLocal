@@ -95,7 +95,14 @@ class LocalSolverBase(BaseSolver):
                 raise ValidationError("bandwidth must be positive")
 
         # Validate distance_metric
-        valid_metrics = ["euclidean", "manhattan", "cosine", "chebyshev", "minkowski", "dtw"]
+        valid_metrics = [
+            "euclidean",
+            "manhattan",
+            "cosine",
+            "chebyshev",
+            "minkowski",
+            "dtw",
+        ]
         if self.distance_metric not in valid_metrics:
             raise ValidationError(f"distance_metric must be one of {valid_metrics}")
 
